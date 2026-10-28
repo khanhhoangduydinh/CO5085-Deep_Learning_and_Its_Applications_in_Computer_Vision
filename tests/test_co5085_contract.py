@@ -97,3 +97,11 @@ def test_report_maps_formulas_and_algorithms_to_all_three_exercises():
         "Algorithm 3: Row-Sequence Classification",
     ]:
         assert heading in report
+
+
+def test_shared_theory_is_not_numbered_as_a_zero_section():
+    """An unnumbered introduction should not create an awkward 0.1 heading."""
+    root = Path(__file__).parents[1]
+    report = (root / "CO5085 Report Latex" / "report.tex").read_text(encoding="utf-8")
+
+    assert r"\subsection*{Shared Learning Workflow and Notation}" in report

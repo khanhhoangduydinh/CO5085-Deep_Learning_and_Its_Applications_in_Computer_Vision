@@ -103,10 +103,11 @@ The official 60,000 training images are shuffled with seed 42, then split into 4
 \subsection*{Reproducibility and AI-use declaration}
 The project uses direct PyTorch code. Run \texttt{python -m E1.run\_e1}, \texttt{python -m E2.run\_e2}, and \texttt{python -m E3.run\_e3} from the repository root. The first run downloads Fashion-MNIST. Figures and JSON metrics are saved in \texttt{reports/}. AI assistance was used to help organize code and explain concepts. The student reviewed the code, ran the experiments, and is responsible for understanding and defending every model, result, and conclusion in this report.
 
-\subsection{Shared Learning Workflow and Notation}
+\subsection*{Shared Learning Workflow and Notation}
+\addcontentsline{toc}{subsection}{Shared Learning Workflow and Notation}
 One image is a tensor $x\in\mathbb{R}^{1\times28\times28}$. The first dimension is one grayscale channel, and the other two dimensions are image height and width. The loader changes raw pixel values from 0--255 into floating-point values, then normalizes them. A mini-batch contains $B=256$ images and labels. A label $y$ is an integer from 0 to 9; the model produces ten scores, one score for each clothing class.
 
-\subsubsection{Softmax, Cross-Entropy, and Gradient Update}
+\subsubsection*{Softmax, Cross-Entropy, and Gradient Update}
 Let $z=(z_1,\ldots,z_{10})$ be the ten raw scores, also called logits. Softmax converts these scores into class probabilities:
 \[
 p_i=\frac{\exp(z_i)}{\sum_{j=1}^{10}\exp(z_j)}.
@@ -121,7 +122,7 @@ The loss is small when the true class receives high probability and large when i
 \]
 where $\eta=0.001$ is the learning rate. Adam uses extra running averages to make this update more stable, but the direction still comes from the gradient.
 
-\subsubsection{Algorithm 1: Shared Training and Evaluation Loop}
+\subsubsection*{Algorithm 1: Shared Training and Evaluation Loop}
 The following steps match \texttt{get\_loaders}, \texttt{train\_epoch}, and \texttt{evaluate} in \texttt{common.py}.
 \begin{enumerate}[leftmargin=8mm]
   \item Set the random seed to 42, load Fashion-MNIST, and recreate the same 48,000/12,000 train-validation indices.
