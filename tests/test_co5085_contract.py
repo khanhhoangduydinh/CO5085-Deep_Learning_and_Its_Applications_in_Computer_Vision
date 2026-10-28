@@ -8,6 +8,7 @@ from common import make_split_indices
 from E1.run_e1 import CNNClassifier, MLPClassifier, SoftmaxClassifier
 from E2.run_e2 import CNNStemTokenizer, ManualMSA, PatchTokenizer
 from E3.run_e3 import RowSequenceClassifier
+from A1.run_a1 import EXPERIMENTS, LOADER_WORKERS, build_model, make_stratified_indices, select_best_experiment
 
 
 def test_fixed_split_uses_train_images_only_for_training_and_validation():
@@ -105,3 +106,90 @@ def test_shared_theory_is_not_numbered_as_a_zero_section():
     report = (root / "CO5085 Report Latex" / "report.tex").read_text(encoding="utf-8")
 
     assert r"\subsection*{Shared Learning Workflow and Notation}" in report
+
+
+def test_a1_stratified_split_keeps_400_train_and_100_validation_images_per_class():
+    """A1 must use every CIFAR-100 training image without mixing in the test set."""
+    labels = [class_id for class_id in range(100) for _ in range(500)]
+    train_ids, validation_ids = make_stratified_indices(labels)
+
+    assert len(train_ids) == 40_000
+    assert len(validation_ids) == 10_000
+    assert set(train_ids).isdisjoint(validation_ids)
+    assert {labels[index] for index in train_ids} == set(range(100))
+    assert all(sum(labels[index] == class_id for index in train_ids) == 400 for class_id in range(100))
+    assert all(sum(labels[index] == class_id for index in validation_ids) == 100 for class_id in range(100))
+
+
+def test_a1_models_return_100_scores_for_cifar100_images():
+    """Changing a classifier head must not silently leave its ImageNet output size."""
+    images = torch.zeros(2, 3, 96, 96)
+
+    for family in ["cnn", "transformer"]:
+        model = build_model(family, "scratch", classes=100)
+        assert model(images).shape == (2, 100)
+
+
+def test_a1_pretrained_freeze_modes_train_the_expected_amount_of_the_model():
+    """Head, partial, and full must be distinct transfer-learning modes."""
+    counts = {}
+    for family in ["cnn", "transformer"]:
+        for mode in ["head", "partial", "full"]:
+            model = build_model(family, mode, classes=100)
+            counts[family, mode] = sum(parameter.numel() for parameter in model.parameters() if parameter.requires_grad)
+
+        assert counts[family, "head"] < counts[family, "partial"] < counts[family, "full"]
+
+
+def test_a1_experiment_matrix_has_both_families_and_every_required_mode():
+    """The declared runner matrix implements the full A1 comparison."""
+    assert {(item["family"], item["mode"]) for item in EXPERIMENTS} == {
+        (family, mode)
+        for family in ["cnn", "transformer"]
+        for mode in ["scratch", "head", "partial", "full"]
+    }
+
+
+def test_a1_selects_the_validation_winner_without_using_test_accuracy():
+    """The official test set must not choose a configuration for A1."""
+    records = [
+        {"family": "cnn", "mode": "head", "validation_accuracy": 0.60, "test_accuracy": 0.99},
+        {"family": "transformer", "mode": "full", "validation_accuracy": 0.70, "test_accuracy": 0.01},
+    ]
+
+    winner = select_best_experiment(records)
+
+    assert winner["family"] == "transformer"
+    assert winner["mode"] == "full"
+
+
+def test_a1_loader_uses_parallel_workers_for_cpu_image_preprocessing():
+    """Resizing and augmentation should not leave the available GPU idle."""
+    assert LOADER_WORKERS == 4
+
+
+def test_a1_submission_links_and_report_source_are_published():
+    """The A1 landing-page entry must lead to code, instructions, and a report."""
+    root = Path(__file__).parents[1]
+    page = (root / "index.html").read_text(encoding="utf-8")
+    report = root / "CO5085 Report Latex" / "a1_report.tex"
+
+    for path in [
+        "A1/run_a1.py",
+        "A1/README.md",
+        "CO5085%20Report%20Latex/a1_report.pdf",
+    ]:
+        assert path in page
+
+    assert (root / "A1" / "README.md").is_file()
+    assert report.is_file()
+    assert (root / "CO5085 Report Latex" / "a1_report.pdf").is_file()
+    report_text = report.read_text(encoding="utf-8")
+    for heading in [
+        "CIFAR-100 Dataset and Protocol",
+        "ResNet-18 and Swin-T Theory",
+        "Transfer Learning and Freeze Modes",
+        "Experiment Algorithm",
+        "Measured Results and Discussion",
+    ]:
+        assert heading in report_text

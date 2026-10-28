@@ -47,15 +47,15 @@ h2 { font-size: clamp(1.5rem, 3vw, 2.3rem); line-height: 1.05; letter-spacing: -
 .result-note { justify-self: end; color: #b7cee4; font-size: .82rem; }
 .method-note, .run-section { display: grid; grid-template-columns: .9fr 1.1fr; gap: 60px; padding: 74px 0; border-bottom: 1px solid var(--line); }
 .method-note p:last-child, .run-section p { color: var(--muted); }
-.exercise-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-bottom: 1px solid var(--line); }
-article { min-height: 450px; padding: 44px 30px 36px; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
+.exercise-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-bottom: 1px solid var(--line); }
+article { min-height: 470px; padding: 44px 30px 36px; border-right: 1px solid var(--line); display: flex; flex-direction: column; }
 article:first-child { border-left: 1px solid var(--line); }
 article p:not(.exercise-number) { color: var(--muted); }
 dl { margin: auto 0 24px; font-size: .87rem; }
 dl div { padding: 9px 0; border-top: 1px solid var(--line); }
 dt { color: var(--muted); font-size: .72rem; }
 dd { margin: 0; font-weight: 700; }
-article a { color: var(--cobalt); font-weight: 800; text-decoration-thickness: 2px; }
+article a { color: var(--cobalt); font-weight: 800; text-decoration-thickness: 2px; margin-top: 9px; }
 pre { margin: 0; overflow: auto; padding: 26px; background: var(--wash); border-left: 5px solid var(--signal); color: var(--ink); font-size: .92rem; }
 footer { display: flex; justify-content: space-between; padding: 28px 0 42px; color: var(--muted); font-size: .8rem; }
 

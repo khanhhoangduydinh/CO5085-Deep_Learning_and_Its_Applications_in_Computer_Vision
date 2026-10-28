@@ -22,6 +22,7 @@ CO5085 Report Latex/images/*
 !CO5085 Report Latex/images/e1_*.png
 !CO5085 Report Latex/images/e2_*.png
 !CO5085 Report Latex/images/e3_*.png
+!CO5085 Report Latex/images/a1_*.png
 
 # Old course files copied beside the CO5085 exercise are not part of this submission.
 assignment1-vne.pdf

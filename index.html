@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="CO5085 E1, E2, and E3 Fashion-MNIST exercises.">
-    <title>CO5085 Exercises | Fashion-MNIST</title>
+    <meta name="description" content="CO5085 E1-E3 exercises and A1 CNN versus Transformer comparison on CIFAR-100.">
+    <title>CO5085 | Exercises and A1</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <header class="site-header">
       <a class="identity" href="#top">HCMUT <span>CO5085</span></a>
       <nav aria-label="Main navigation">
-        <a href="#results">Results</a>
+        <a href="#results">A1 result</a>
         <a href="#exercises">Exercises</a>
         <a href="#reproduce">Run it</a>
       </nav>
@@ -21,29 +21,29 @@
     <main id="top">
       <section class="hero">
         <p class="course-line">Deep Learning and Its Applications in Computer Vision</p>
-        <h1>One dataset.<br>Three ways to read an image.</h1>
-        <p class="summary">A beginner-level CO5085 submission that compares linear, convolutional, attention, and recurrent models on Fashion-MNIST.</p>
+        <h1>From pixels<br>to visual models.</h1>
+        <p class="summary">A beginner-level CO5085 submission: E1-E3 explore Fashion-MNIST, and A1 compares a CNN with a Transformer on the 100-class CIFAR-100 dataset.</p>
         <div class="hero-meta">
-          <span>48,000 training images</span>
-          <span>12,000 validation images</span>
-          <span>10,000 final test images</span>
+          <span>A1: 40,000 training images</span>
+          <span>A1: 10,000 validation images</span>
+          <span>CIFAR-100: 100 classes</span>
         </div>
-        <a class="primary-action" href="CO5085%20Report%20Latex/report.pdf">Read the full report</a>
+        <a class="primary-action" href="CO5085%20Report%20Latex/a1_report.pdf">Read the A1 report</a>
       </section>
 
       <section class="result-strip" id="results" aria-label="Main result">
-        <p>Best result</p>
-        <strong>86.86%</strong>
-        <span>CNN test accuracy after three epochs</span>
-        <span class="result-note">Fashion-MNIST · seed 42 · batch 256</span>
+        <p>A1 selected result</p>
+        <strong>81.73%</strong>
+        <span>Swin-T full fine-tune test accuracy</span>
+        <span class="result-note">CIFAR-100 · seed 42 · batch 64 · 3 epochs</span>
       </section>
 
       <section class="method-note">
         <div>
           <p class="section-label">Shared experiment rules</p>
-          <h2>Same split, direct comparison.</h2>
+          <h2>Same split, honest selection.</h2>
         </div>
-        <p>The official training set is split once into 48,000 training and 12,000 validation images. Each exercise uses the same final 10,000-image test set. Results show actual executed runs, not estimated scores.</p>
+        <p>E1-E3 share the same Fashion-MNIST split. A1 uses 400 training and 100 validation images from each CIFAR-100 fine class, then evaluates the validation winner once on the untouched official test set. Results show actual executed runs, not estimated scores.</p>
       </section>
 
       <section class="exercise-grid" id="exercises">
@@ -80,23 +80,37 @@
           </dl>
           <a href="E3/run_e3.py">Open E3 source</a>
         </article>
+        <article>
+          <p class="exercise-number">A1</p>
+          <h2>CNN vs Transformer</h2>
+          <p>ResNet-18 and Swin-T are compared from scratch and with ImageNet pretraining, including head-only, partial, and full fine-tuning.</p>
+          <dl>
+            <div><dt>Dataset</dt><dd>CIFAR-100 · 100 classes</dd></div>
+            <div><dt>Selected model</dt><dd>Swin-T full fine-tune</dd></div>
+            <div><dt>Test accuracy / macro-F1</dt><dd>81.73% / 81.62%</dd></div>
+          </dl>
+          <a href="A1/run_a1.py">Open A1 source</a>
+          <a href="A1/README.md">Read A1 guide</a>
+          <a href="CO5085%20Report%20Latex/a1_report.pdf">Read A1 report</a>
+        </article>
       </section>
 
       <section class="run-section" id="reproduce">
         <div>
           <p class="section-label">Reproduce the submission</p>
-          <h2>Run one command per exercise.</h2>
-          <p>Install the packages in <code>requirements.txt</code>. Fashion-MNIST downloads on the first run and generated figures are saved under <code>reports/</code>.</p>
+          <h2>Run one command per deliverable.</h2>
+          <p>Install the packages in <code>requirements.txt</code>. Fashion-MNIST or CIFAR-100 downloads on the first run, and generated figures are saved under <code>reports/</code>.</p>
         </div>
         <pre><code>python -m E1.run_e1
 python -m E2.run_e2
-python -m E3.run_e3</code></pre>
+python -m E3.run_e3
+python -m A1.run_a1</code></pre>
       </section>
     </main>
 
     <footer>
-      <span>CO5085 Exercises Report · HK261 (2026–2027)</span>
-      <a href="CO5085%20Report%20Latex/report.pdf">PDF report</a>
+      <span>CO5085 Exercises and A1 · HK261 (2026–2027)</span>
+      <span><a href="CO5085%20Report%20Latex/report.pdf">E1-E3 PDF</a> · <a href="CO5085%20Report%20Latex/a1_report.pdf">A1 PDF</a></span>
     </footer>
   </body>
 </html>
