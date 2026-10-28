@@ -92,7 +92,7 @@ FACULTY OF COMPUTER SCIENCE AND ENGINEERING
 \addcontentsline{toc}{section}{Introduction and Assignment Goal}
 Assignment A1 asks for a fair comparison between a CNN and a Transformer on a public image dataset that is larger and harder than the E1 dataset. The comparison must include random initialization and ImageNet pretraining. For each pretrained model, it must include three choices: train the classifier head only, train part of the backbone, and train all layers. It must also report accuracy or F1, training cost, and error analysis.
 
-This project uses CIFAR-100. The code compares ResNet-18, a CNN, with Swin-T, a hierarchical vision Transformer. There are eight experiments: four for each family. Every experiment uses the same train-validation split and the same three-epoch budget. Validation accuracy selects one configuration. The untouched official test set is used once for that selected configuration. This rule prevents a test result from deciding which model looks best.
+This project uses CIFAR-100. The code compares ResNet-18, a CNN, with Swin-T, a hierarchical vision Transformer. There are eight experiments: four for each family. Every experiment uses the same train-validation split and the same three-epoch budget. Validation accuracy selects one configuration. The untouched official test set is used only after that selection. This rule prevents a test result from deciding which model looks best.
 
 \begin{importantbox}
 \textbf{Main measured result.} The validation winner is ImageNet-pretrained Swin-T with full fine-tuning. It obtains validation accuracy 0.8281. One final run on the official CIFAR-100 test set gives accuracy 0.8173 and macro-F1 0.8162. These numbers are measured by \texttt{A1/run\_a1.py}; they are not estimated values.
@@ -219,7 +219,7 @@ The following steps correspond directly to \texttt{A1/run\_a1.py}.
   \item Compute \texttt{CrossEntropyLoss}. Clear old gradients with \texttt{zero\_grad()}, call \texttt{loss.backward()}, then call \texttt{optimizer.step()}.
   \item Switch to evaluation mode and calculate validation loss and accuracy without gradients. Keep a CPU copy of the weights when validation accuracy improves.
   \item Repeat Steps 3--7 for all eight rows. Do not inspect the official test partition while choosing a row.
-  \item Select the largest validation accuracy using \texttt{select\_best\_experiment}. Load its saved best-validation weights and evaluate the official test partition once.
+  \item Select the largest validation accuracy using \texttt{select\_best\_experiment}. Load its saved best-validation weights and evaluate the official test partition only after selection.
   \item Save JSON metrics and figures: augmentation examples, learning curves, cost comparison, a 20-superclass confusion matrix, and wrong-prediction examples.
 \end{enumerate}
 
@@ -266,8 +266,8 @@ For Swin-T, the same order appears: head-only gives 0.7076, partial gives 0.7573
 \caption{Validation accuracy, trainable parameters, training time, and peak GPU memory for all eight experiments. Orange bars are ResNet-18; blue bars are Swin-T.}\label{fig:comparison}
 \end{figure}
 
-\subsection{One final test evaluation}
-The largest validation accuracy is Swin-T full fine-tune at 0.8281. The saved checkpoint from the best validation epoch is loaded once, then evaluated on the untouched official test partition. The final test metrics are in Table~\ref{tab:test}. No other row receives a test metric in this report, because comparing many test metrics and choosing the largest one would leak test information into model selection.
+\subsection{Official test evaluation after validation selection}
+The largest validation accuracy is Swin-T full fine-tune at 0.8281. The saved checkpoint from the best validation epoch is evaluated on the untouched official test partition only after validation selects it. The recorded final test metrics are in Table~\ref{tab:test}. No other configuration receives a test metric for model selection, because comparing many test metrics and choosing the largest one would leak test information into selection.
 
 \begin{table}[H]\centering
 \caption{One official test evaluation after validation selection.}\label{tab:test}
@@ -277,10 +277,12 @@ Swin-T, ImageNet pretrained, full fine-tune & \textbf{0.8173} & \textbf{0.8162} 
 \end{tabular}
 \end{table}
 
+After the recorded sweep, the already-selected Swin-T full configuration was run again only to regenerate the numbered confusion matrix in Figure~\ref{fig:confusion}. That post-selection reproduction gave test accuracy 0.8140, compared with 0.8173 in Table~\ref{tab:test}. The 0.0033 difference is reported openly: GPU training with parallel data loading can vary slightly between runs. This extra run did not choose or change the selected configuration.
+
 \clearpage
 \section{Error Analysis, Limitations, and Reproduction}
 \subsection{Confusion matrix and wrong predictions}
-The selected model predicts 100 fine classes. A $100\times100$ confusion matrix would be hard to read in a report, so Figure~\ref{fig:confusion} groups true and predicted fine labels into CIFAR-100's 20 official superclasses. Each row is normalized, so the dark diagonal means that a broad group is usually predicted correctly. It is only a readability summary; the model itself still predicts the 100 fine labels.
+The selected model predicts 100 fine classes. A $100\times100$ confusion matrix would be hard to read in a report, so Figure~\ref{fig:confusion} groups true and predicted fine labels into CIFAR-100's 20 official superclasses. Each row is normalized, so the dark diagonal means that a broad group is usually predicted correctly. It is only a readability summary; the model itself still predicts the 100 fine labels. This figure uses the transparent post-selection reproduction described in Section~4.3; it is not used to select a model.
 
 Figure~\ref{fig:errors} shows 12 real wrong predictions from the final test run. Several pairs have visual or semantic similarity: mountain versus road, cloud versus sea, tulip versus orchid, camel versus crocodile, and rabbit versus kangaroo. Some errors also show the basic problem of CIFAR-100: a $32\times32$ source image can contain little detail. Upsizing to $96\times96$ helps the network interface but cannot add missing pixels.
 
