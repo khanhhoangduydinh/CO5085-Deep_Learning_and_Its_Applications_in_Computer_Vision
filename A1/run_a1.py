@@ -327,6 +327,11 @@ def plot_comparison(records):
     plt.close(figure)
 
 
+def format_confusion_label(value):
+    """Show useful row percentages and leave very small cells empty."""
+    return f"{value:.1%}" if value >= 0.01 else ""
+
+
 def plot_coarse_confusion(true_labels, predicted_labels, test_data):
     """Show a readable 20-superclass matrix for the selected 100-class model."""
     fine_to_coarse = {}
@@ -342,6 +347,12 @@ def plot_coarse_confusion(true_labels, predicted_labels, test_data):
     axis.set_ylabel("true superclass ID")
     axis.set_xticks(range(20))
     axis.set_yticks(range(20))
+    for row, column in np.ndindex(matrix.shape):
+        value = matrix[row, column]
+        label = format_confusion_label(value)
+        if label:
+            colour = "white" if value >= 0.50 else "#102a43"
+            axis.text(column, row, label, ha="center", va="center", fontsize=5.5, color=colour)
     figure.colorbar(image, ax=axis, label="row-normalized proportion")
     figure.tight_layout()
     figure.savefig(FIGURE_FOLDER / "a1_04_coarse_confusion_matrix.png", dpi=180)

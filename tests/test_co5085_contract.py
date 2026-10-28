@@ -8,7 +8,14 @@ from common import make_split_indices
 from E1.run_e1 import CNNClassifier, MLPClassifier, SoftmaxClassifier
 from E2.run_e2 import CNNStemTokenizer, ManualMSA, PatchTokenizer
 from E3.run_e3 import RowSequenceClassifier
-from A1.run_a1 import EXPERIMENTS, LOADER_WORKERS, build_model, make_stratified_indices, select_best_experiment
+from A1.run_a1 import (
+    EXPERIMENTS,
+    LOADER_WORKERS,
+    build_model,
+    format_confusion_label,
+    make_stratified_indices,
+    select_best_experiment,
+)
 
 
 def test_fixed_split_uses_train_images_only_for_training_and_validation():
@@ -166,6 +173,13 @@ def test_a1_selects_the_validation_winner_without_using_test_accuracy():
 def test_a1_loader_uses_parallel_workers_for_cpu_image_preprocessing():
     """Resizing and augmentation should not leave the available GPU idle."""
     assert LOADER_WORKERS == 4
+
+
+def test_a1_confusion_labels_show_meaningful_percentages_only():
+    """Figure 5.1 needs readable numbers without filling every small cell with zero."""
+    assert format_confusion_label(0.8281) == "82.8%"
+    assert format_confusion_label(0.01) == "1.0%"
+    assert format_confusion_label(0.009) == ""
 
 
 def test_a1_submission_links_and_report_source_are_published():
