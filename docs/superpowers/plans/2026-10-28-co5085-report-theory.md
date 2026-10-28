@@ -39,16 +39,16 @@
 **Files:**
 - Modify: `CO5085 Report Latex/report.tex`
 
-- [ ] Add a shared split, softmax, cross-entropy, gradient, and accuracy explanation.
-- [ ] Add E1 formulas and an algorithm that follows `common.py` and `E1/run_e1.py`.
+- [x] Add a shared split, softmax, cross-entropy, gradient, and accuracy explanation.
+- [x] Add E1 formulas and an algorithm that follows `common.py` and `E1/run_e1.py`.
 
 ### Task 3: Add E2 and E3 theory
 
 **Files:**
 - Modify: `CO5085 Report Latex/report.tex`
 
-- [ ] Add tokenization and multi-head self-attention formulas with manual-code mapping.
-- [ ] Add LSTM and GRU equations, row-sequence steps, and a CNN comparison explanation.
+- [x] Add tokenization and multi-head self-attention formulas with manual-code mapping.
+- [x] Add LSTM and GRU equations, row-sequence steps, and a CNN comparison explanation.
 
 ### Task 4: Verify and publish
 

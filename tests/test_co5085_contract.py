@@ -80,3 +80,20 @@ def test_public_links_use_the_full_course_repository_name():
 
     assert repository in (root / "index.html").read_text(encoding="utf-8")
     assert repository in (root / "README.md").read_text(encoding="utf-8")
+
+
+def test_report_maps_formulas_and_algorithms_to_all_three_exercises():
+    """The report must explain the theory and the code workflow for E1-E3."""
+    root = Path(__file__).parents[1]
+    report = (root / "CO5085 Report Latex" / "report.tex").read_text(encoding="utf-8")
+
+    for heading in [
+        "Shared Learning Workflow and Notation",
+        "Softmax, Cross-Entropy, and Gradient Update",
+        "Algorithm 1: Shared Training and Evaluation Loop",
+        "Scaled Dot-Product Attention",
+        "Algorithm 2: Manual Multi-Head Self-Attention",
+        "LSTM and GRU Gates",
+        "Algorithm 3: Row-Sequence Classification",
+    ]:
+        assert heading in report

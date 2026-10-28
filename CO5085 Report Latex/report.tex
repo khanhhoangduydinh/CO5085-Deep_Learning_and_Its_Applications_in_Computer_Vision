@@ -103,12 +103,60 @@ The official 60,000 training images are shuffled with seed 42, then split into 4
 \subsection*{Reproducibility and AI-use declaration}
 The project uses direct PyTorch code. Run \texttt{python -m E1.run\_e1}, \texttt{python -m E2.run\_e2}, and \texttt{python -m E3.run\_e3} from the repository root. The first run downloads Fashion-MNIST. Figures and JSON metrics are saved in \texttt{reports/}. AI assistance was used to help organize code and explain concepts. The student reviewed the code, ran the experiments, and is responsible for understanding and defending every model, result, and conclusion in this report.
 
+\subsection{Shared Learning Workflow and Notation}
+One image is a tensor $x\in\mathbb{R}^{1\times28\times28}$. The first dimension is one grayscale channel, and the other two dimensions are image height and width. The loader changes raw pixel values from 0--255 into floating-point values, then normalizes them. A mini-batch contains $B=256$ images and labels. A label $y$ is an integer from 0 to 9; the model produces ten scores, one score for each clothing class.
+
+\subsubsection{Softmax, Cross-Entropy, and Gradient Update}
+Let $z=(z_1,\ldots,z_{10})$ be the ten raw scores, also called logits. Softmax converts these scores into class probabilities:
+\[
+p_i=\frac{\exp(z_i)}{\sum_{j=1}^{10}\exp(z_j)}.
+\]
+Here $p_i$ is the predicted probability of class $i$. A larger logit gives a larger probability, and all ten probabilities sum to one. For a true class index $y$, cross-entropy loss is
+\[
+\mathcal{L}=-\log(p_y).
+\]
+The loss is small when the true class receives high probability and large when it receives low probability. In the code, \texttt{nn.CrossEntropyLoss()} receives logits directly and performs the stable softmax-and-loss calculation internally. Backpropagation computes the gradient $\nabla_\theta\mathcal{L}$ for every learned parameter $\theta$. Adam then updates the parameters; the basic gradient-descent idea is
+\[
+\theta\leftarrow\theta-\eta\nabla_\theta\mathcal{L},
+\]
+where $\eta=0.001$ is the learning rate. Adam uses extra running averages to make this update more stable, but the direction still comes from the gradient.
+
+\subsubsection{Algorithm 1: Shared Training and Evaluation Loop}
+The following steps match \texttt{get\_loaders}, \texttt{train\_epoch}, and \texttt{evaluate} in \texttt{common.py}.
+\begin{enumerate}[leftmargin=8mm]
+  \item Set the random seed to 42, load Fashion-MNIST, and recreate the same 48,000/12,000 train-validation indices.
+  \item Read one batch of normalized images and integer labels, then move both tensors to the selected device.
+  \item Call the model with the image batch. This is the forward pass and returns ten logits per image.
+  \item Compute cross-entropy loss from logits and true labels.
+  \item During training, clear old gradients, run backpropagation, then update parameters. The code calls \texttt{zero\_grad()}, \texttt{backward()}, and \texttt{step()} in that order.
+  \item Count predictions with \texttt{argmax}; accuracy is $\frac{\text{number of correct predictions}}{\text{number of images}}$.
+  \item At the end of each epoch, switch to \texttt{model.eval()} and use \texttt{torch.no\_grad()} for validation. This measures the model without changing weights.
+  \item Keep the official test set separate until the experiment has finished, then report final test accuracy and save JSON and figures.
+\end{enumerate}
+
 \clearpage
 \section{E1 -- Softmax, MLP, and CNN}
 \subsection{Objective and model design}
 E1 requires three classifiers and a custom training loop. The shared loop in \texttt{common.py} is explicit: for each batch it predicts scores, computes cross-entropy loss, calls \texttt{loss.backward()}, then calls \texttt{optimizer.step()}. This makes the learning process visible instead of hiding it inside a high-level trainer.
 
 The Softmax classifier flattens an image into 784 pixel values and uses one linear layer with ten outputs. The MLP also flattens the image, then uses hidden layers of 128 and 64 values with ReLU activation. The CNN keeps the image grid. It applies convolution, ReLU, and max-pooling twice before a small fully connected head. Convolution helps the CNN learn local edges and clothing shapes from nearby pixels.
+
+\subsection{E1 Theory and Code Workflow}
+For the linear Softmax classifier, flattening gives $v\in\mathbb{R}^{784}$. The model computes $z=vW+b$, where $W\in\mathbb{R}^{784\times10}$ is a learned weight matrix and $b\in\mathbb{R}^{10}$ is a learned bias. This model can only make one linear decision boundary for each class.
+
+The MLP adds nonlinear layers:
+\[
+h_1=\mathrm{ReLU}(vW_1+b_1),\qquad h_2=\mathrm{ReLU}(h_1W_2+b_2),\qquad z=h_2W_3+b_3.
+\]
+ReLU is $\mathrm{ReLU}(a)=\max(0,a)$. It keeps positive values and sets negative values to zero. Because of ReLU, the MLP can represent patterns that a single linear layer cannot.
+
+For a CNN, a filter reads a small local window. At position $(r,c)$, one output value can be written as
+\[
+a_{r,c,k}=\sum_{u,v,d}x_{r+u,c+v,d}\,w_{u,v,d,k}+b_k.
+\]
+The indices $u,v$ move inside the small kernel, $d$ selects an input channel, and $k$ selects a learned filter. ReLU follows the convolution. Max-pooling keeps the largest value in a small region, reducing height and width while preserving a strong detected feature. In \texttt{CNNClassifier}, two convolution-and-pooling blocks turn the image into learned feature maps before the final classifier.
+
+The E1 script creates one model at a time, calls the shared loop for three epochs, records loss and validation accuracy after each epoch, evaluates the official test set once, then saves a confusion matrix and several incorrect CNN predictions. Thus the displayed error examples come from real final predictions, not selected images.
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.74\textwidth]{images/e1_01_examples.png}
@@ -160,6 +208,30 @@ Attention first needs a sequence of image tokens. The patch tokenizer cuts an im
 
 The manual MSA uses only linear layers, matrix multiplication, transpose, softmax, and reshape. For tokens $X$, it forms $Q=XW_Q$, $K=XW_K$, and $V=XW_V$. Attention weights are $\mathrm{softmax}(QK^T/\sqrt{d})$ and the output is a weighted sum of $V$. The code splits 32 values into two heads, computes each head, and joins them. It does not call \texttt{nn.MultiheadAttention}. The next experiment uses PyTorch MSA with the same patch tokens and settings. The third experiment changes only the tokenizer to the CNN stem.
 
+\subsection{Scaled Dot-Product Attention}
+For an image token matrix $X\in\mathbb{R}^{49\times32}$, each row is one of 49 tokens and each token has 32 values. The model uses three learned projections:
+\[
+Q=XW_Q,\qquad K=XW_K,\qquad V=XW_V.
+\]
+Query $Q$ asks what information a token needs. Key $K$ describes what a token offers. Value $V$ is the information that can be passed to another token. For one attention head with head dimension $d_h=16$, the scaled dot-product result is
+\[
+\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\left(\frac{QK^T}{\sqrt{d_h}}\right)V.
+\]
+The matrix $QK^T$ compares every token with every other token. Dividing by $\sqrt{d_h}$ prevents large dot products from making softmax too sharp. Each row after softmax contains weights that sum to one, so the result is a weighted combination of value vectors.
+
+\subsubsection{Algorithm 2: Manual Multi-Head Self-Attention}
+This algorithm follows \texttt{ManualMSA.forward} in \texttt{E2/run\_e2.py}.
+\begin{enumerate}[leftmargin=8mm]
+  \item Create tokens using either 49 flattened $4\times4$ patches or 49 positions from the CNN feature map.
+  \item Apply four linear layers to compute Q, K, V, and the final output projection.
+  \item Reshape Q, K, and V from 32 values into two heads of 16 values using \texttt{split\_heads}.
+  \item For every head, compute $QK^T/\sqrt{16}$, apply softmax across keys, and multiply the weights by V.
+  \item Transpose and reshape the two heads back into 32 values, then apply the output linear layer.
+  \item Add the original tokens to the attention result, normalize with \texttt{LayerNorm}, and apply the small feed-forward network with a second residual connection.
+  \item Average the final 49 tokens and apply one linear classifier to obtain ten logits.
+\end{enumerate}
+The PyTorch comparison calls \texttt{nn.MultiheadAttention} at the same point in the model. Matching patch-token results are evidence that the manual shapes, scaling, and head merge are working as intended. The CNN-stem experiment changes the input representation only, making the tokenization comparison meaningful.
+
 \begin{table}[H]\centering
 \caption{E2 attention and tokenization comparison; all runs use two epochs.}\label{tab:e2-results}
 \begin{tabular}{lrrr}\toprule
@@ -195,6 +267,37 @@ E3 reads an image as a sequence instead of a grid. Each of the 28 image rows is 
 \end{figure}
 
 LSTM and GRU both use hidden size 64 and a final linear classifier. The last recurrent output predicts the clothing class. LSTM has separate gates and a cell state, so it has more parameters. GRU combines some gates, so it is smaller. The E1 CNN result is the image-grid baseline.
+
+\subsection{LSTM and GRU Gates}
+Let $r_t\in\mathbb{R}^{28}$ be row $t$ of an image and $h_{t-1}$ be the hidden state from the previous row. The LSTM controls what to keep and forget with gates:
+\[
+\begin{aligned}
+i_t&=\sigma(W_i[r_t,h_{t-1}]+b_i), & f_t&=\sigma(W_f[r_t,h_{t-1}]+b_f),\\
+o_t&=\sigma(W_o[r_t,h_{t-1}]+b_o), & g_t&=\tanh(W_g[r_t,h_{t-1}]+b_g),\\
+c_t&=f_t\odot c_{t-1}+i_t\odot g_t, & h_t&=o_t\odot\tanh(c_t).
+\end{aligned}
+\]
+The sigmoid function $\sigma$ gives a value between 0 and 1, so gates can act like soft switches. The symbol $\odot$ means element-by-element multiplication. The cell state $c_t$ carries information through many steps; the hidden state $h_t$ is the output used at the next step.
+
+GRU uses fewer gates:
+\[
+\begin{aligned}
+z_t&=\sigma(W_z[r_t,h_{t-1}]+b_z), & q_t&=\sigma(W_q[r_t,h_{t-1}]+b_q),\\
+\widetilde{h}_t&=\tanh(W_h[r_t,q_t\odot h_{t-1}]+b_h), & h_t&=(1-z_t)\odot h_{t-1}+z_t\odot\widetilde{h}_t.
+\end{aligned}
+\]
+The update gate $z_t$ decides how much new row information replaces the old hidden state. This smaller structure explains why the GRU has fewer parameters and finishes faster in the measured run.
+
+\subsubsection{Algorithm 3: Row-Sequence Classification}
+The following steps match \texttt{RowSequenceClassifier} and \texttt{train\_model} in \texttt{E3/run\_e3.py}.
+\begin{enumerate}[leftmargin=8mm]
+  \item Start with an image batch of shape $(B,1,28,28)$ and remove the single channel dimension.
+  \item Read the result as $(B,28,28)$: 28 row time steps, each containing 28 pixel values.
+  \item Send the full sequence to either \texttt{nn.LSTM} or \texttt{nn.GRU} with hidden size 64.
+  \item Select the last output $h_{28}$ because it summarizes the rows processed from top to bottom.
+  \item Apply the final linear layer to get ten logits, then use the same cross-entropy and optimizer steps as Algorithm 1.
+  \item Compare LSTM and GRU with the saved CNN metric from E1. CNN is a fair baseline because it receives the original two-dimensional image rather than a row sequence.
+\end{enumerate}
 
 \begin{table}[H]\centering
 \caption{E3 recurrent models and the CNN baseline.}\label{tab:e3-results}
