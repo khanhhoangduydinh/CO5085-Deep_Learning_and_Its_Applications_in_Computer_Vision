@@ -1,0 +1,29 @@
+{
+  "dataset": "Fashion-MNIST",
+  "tokenizations": {
+    "patch": "49 tokens of 4x4 pixels",
+    "cnn_stem": "49 feature-map tokens from a small CNN stem"
+  },
+  "epochs": 2,
+  "models": {
+    "Manual MSA + patch": {
+      "parameters": 10986,
+      "seconds": 110.74541200000021,
+      "validation_accuracy": 0.712,
+      "test_accuracy": 0.7061
+    },
+    "PyTorch MSA + patch": {
+      "parameters": 10986,
+      "seconds": 95.53643139999986,
+      "validation_accuracy": 0.70975,
+      "test_accuracy": 0.7072
+    },
+    "PyTorch MSA + CNN stem": {
+      "parameters": 15242,
+      "seconds": 119.14060599999993,
+      "validation_accuracy": 0.7506666666666667,
+      "test_accuracy": 0.7578
+    }
+  },
+  "selected_model": "PyTorch MSA + CNN stem"
+}

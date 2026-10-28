@@ -1,0 +1,31 @@
+{
+  "dataset": "Fashion-MNIST",
+  "split": {
+    "train": 48000,
+    "validation": 12000,
+    "test": 10000,
+    "seed": 42
+  },
+  "epochs": 3,
+  "models": {
+    "Softmax linear": {
+      "parameters": 7850,
+      "seconds": 125.1990409,
+      "validation_accuracy": 0.83675,
+      "test_accuracy": 0.8258
+    },
+    "MLP": {
+      "parameters": 109386,
+      "seconds": 103.21089459999985,
+      "validation_accuracy": 0.8591666666666666,
+      "test_accuracy": 0.8518
+    },
+    "CNN": {
+      "parameters": 105866,
+      "seconds": 156.41904149999982,
+      "validation_accuracy": 0.86975,
+      "test_accuracy": 0.8686
+    }
+  },
+  "selected_baseline": "CNN"
+}

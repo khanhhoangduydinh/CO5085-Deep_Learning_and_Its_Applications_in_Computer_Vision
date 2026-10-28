@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Downloaded data and generated model files are reproducible and too large for Git.
+data/
+reports/checkpoints/
+reports/figures/
+reports/*.log
+
+# LaTeX build files. The final PDF is kept for GitHub Pages.
+CO5085 Report Latex/*.aux
+CO5085 Report Latex/*.log
+CO5085 Report Latex/*.out
+CO5085 Report Latex/*.toc
+CO5085 Report Latex/*.fls
+CO5085 Report Latex/*.fdb_latexmk
+CO5085 Report Latex/*.synctex.gz
+CO5085 Report Latex/qa_render/
+CO5085 Report Latex/chapters/
+CO5085 Report Latex/images/*
+!CO5085 Report Latex/images/e1_*.png
+!CO5085 Report Latex/images/e2_*.png
+!CO5085 Report Latex/images/e3_*.png
+
+# Old course files copied beside the CO5085 exercise are not part of this submission.
+assignment1-vne.pdf
+assignment2-vne.pdf

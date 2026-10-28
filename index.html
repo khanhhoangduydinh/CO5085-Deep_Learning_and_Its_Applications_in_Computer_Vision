@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CO5085 E1, E2, and E3 Fashion-MNIST exercises.">
+    <title>CO5085 Exercises | Fashion-MNIST</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="identity" href="#top">HCMUT <span>CO5085</span></a>
+      <nav aria-label="Main navigation">
+        <a href="#results">Results</a>
+        <a href="#exercises">Exercises</a>
+        <a href="#reproduce">Run it</a>
+      </nav>
+      <a class="repo-link" href="https://github.com/khanhhoangduydinh/CO5085-Deep_Learning_and_Computer_Vision_Exercises">GitHub repository</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <p class="course-line">Deep Learning and Its Applications in Computer Vision</p>
+        <h1>One dataset.<br>Three ways to read an image.</h1>
+        <p class="summary">A beginner-level CO5085 submission that compares linear, convolutional, attention, and recurrent models on Fashion-MNIST.</p>
+        <div class="hero-meta">
+          <span>48,000 training images</span>
+          <span>12,000 validation images</span>
+          <span>10,000 final test images</span>
+        </div>
+        <a class="primary-action" href="CO5085%20Report%20Latex/report.pdf">Read the full report</a>
+      </section>
+
+      <section class="result-strip" id="results" aria-label="Main result">
+        <p>Best result</p>
+        <strong>86.86%</strong>
+        <span>CNN test accuracy after three epochs</span>
+        <span class="result-note">Fashion-MNIST · seed 42 · batch 256</span>
+      </section>
+
+      <section class="method-note">
+        <div>
+          <p class="section-label">Shared experiment rules</p>
+          <h2>Same split, direct comparison.</h2>
+        </div>
+        <p>The official training set is split once into 48,000 training and 12,000 validation images. Each exercise uses the same final 10,000-image test set. Results show actual executed runs, not estimated scores.</p>
+      </section>
+
+      <section class="exercise-grid" id="exercises">
+        <article>
+          <p class="exercise-number">E1</p>
+          <h2>Image classifiers</h2>
+          <p>Softmax, MLP, and CNN are trained with an explicit forward, loss, backward, and optimizer-step loop.</p>
+          <dl>
+            <div><dt>Selected model</dt><dd>CNN</dd></div>
+            <div><dt>Test accuracy</dt><dd>86.86%</dd></div>
+            <div><dt>Evidence</dt><dd>Curves, confusion matrix, error samples</dd></div>
+          </dl>
+          <a href="E1/run_e1.py">Open E1 source</a>
+        </article>
+        <article>
+          <p class="exercise-number">E2</p>
+          <h2>Image attention</h2>
+          <p>Manual multi-head self-attention is checked against PyTorch attention with patch and CNN-stem tokens.</p>
+          <dl>
+            <div><dt>Selected model</dt><dd>MSA + CNN stem</dd></div>
+            <div><dt>Test accuracy</dt><dd>75.78%</dd></div>
+            <div><dt>Evidence</dt><dd>Tokenization and MSA comparison</dd></div>
+          </dl>
+          <a href="E2/run_e2.py">Open E2 source</a>
+        </article>
+        <article>
+          <p class="exercise-number">E3</p>
+          <h2>Image sequences</h2>
+          <p>Each 28-pixel image row becomes one time step for LSTM and GRU; the E1 CNN is the baseline.</p>
+          <dl>
+            <div><dt>Selected model</dt><dd>LSTM rows</dd></div>
+            <div><dt>Test accuracy</dt><dd>82.01%</dd></div>
+            <div><dt>Evidence</dt><dd>Learning curves and CNN comparison</dd></div>
+          </dl>
+          <a href="E3/run_e3.py">Open E3 source</a>
+        </article>
+      </section>
+
+      <section class="run-section" id="reproduce">
+        <div>
+          <p class="section-label">Reproduce the submission</p>
+          <h2>Run one command per exercise.</h2>
+          <p>Install the packages in <code>requirements.txt</code>. Fashion-MNIST downloads on the first run and generated figures are saved under <code>reports/</code>.</p>
+        </div>
+        <pre><code>python -m E1.run_e1
+python -m E2.run_e2
+python -m E3.run_e3</code></pre>
+      </section>
+    </main>
+
+    <footer>
+      <span>CO5085 Exercises Report · HK261 (2026–2027)</span>
+      <a href="CO5085%20Report%20Latex/report.pdf">PDF report</a>
+    </footer>
+  </body>
+</html>
