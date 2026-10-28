@@ -32,7 +32,7 @@
 
 - [x] Rename the GitHub repository with the REST API and update the `origin` URL.
 - [x] Replace all old repository URLs in local Pages and README files.
-- [ ] Push the link update and verify the new Pages deployment serves it.
+- [x] Push the link update and verify the new Pages deployment serves it.
 
 ### Task 2: Add shared and E1 theory
 
@@ -52,6 +52,6 @@
 
 ### Task 4: Verify and publish
 
-- [ ] Compile LaTeX twice and inspect formula/workflow pages as PNGs.
-- [ ] Run focused static and source tests.
-- [ ] Commit, push, compare local and remote SHA, and verify public Pages plus PDF HTTP responses.
+- [x] Compile LaTeX twice and inspect formula/workflow pages as PNGs.
+- [x] Run focused static and source tests.
+- [x] Commit, push, compare local and remote SHA, and verify public Pages plus PDF HTTP responses.
