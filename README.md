@@ -2,6 +2,8 @@
 
 This repository completes E1, E2, and E3 of CO5085 with Fashion-MNIST. The code is intentionally short and written for a beginner to read.
 
+Repository: [CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision](https://github.com/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision)
+
 | Exercise | Main comparison | Best test accuracy |
 | --- | --- | ---: |
 | E1 | Softmax, MLP, CNN | CNN: 0.8686 |

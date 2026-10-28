@@ -71,3 +71,12 @@ def test_pages_links_point_to_existing_submission_files():
         assert path in page
 
     assert (root / "CO5085 Report Latex" / "report.pdf").is_file()
+
+
+def test_public_links_use_the_full_course_repository_name():
+    """The site and README must name the current course, not a shortened title."""
+    root = Path(__file__).parents[1]
+    repository = "CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision"
+
+    assert repository in (root / "index.html").read_text(encoding="utf-8")
+    assert repository in (root / "README.md").read_text(encoding="utf-8")
