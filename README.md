@@ -37,7 +37,7 @@ This repository contains the course assignments for **CO5085**, Ho Chi Minh City
 ### 2. Exercise 2 (E2) — Transformer Attention & Tokenization
 
 - **Data:** Fashion-MNIST with the identical 48,000 / 12,000 / 10,000 split (seed 42).
-- **Approach:** Implement Multi-Head Self-Attention (MSA) from scratch (`ManualMSA`) using standard matrix multiplication and softmax scaling ($\text{Attention}(Q, K, V) = \text{softmax}(QK^T / \sqrt{d})V$), compare against PyTorch's native `nn.MultiheadAttention`, and evaluate 3 recommended tokenization strategies (4x4 Patch, CNN-Stem, and Row tokenizers).
+- **Approach:** Implement Multi-Head Self-Attention (MSA) from scratch (`ManualMSA`) using standard matrix multiplication and softmax scaling ($\text{Attention}(Q, K, V) = \text{softmax}(QK^T / \sqrt{d})V$). The three measured runs compare manual and PyTorch MSA with 4x4 patch tokens, then PyTorch MSA with CNN-stem tokens. The Row tokenizer is implemented and shape-tested separately; it has no recorded benchmark result.
 - **Saved results:** PyTorch MSA with CNN-Stem tokenization achieved test accuracy **0.7578** (75.78%), outperforming Patch-based PyTorch MSA (**0.7072**) and Patch-based Manual MSA (**0.7061**). Manual MSA produces numerical results that closely match PyTorch MSA. See [e2_results.json](reports/e2_results.json).
 - **Files:** [Google Colab notebook](notebooks/e2_transformer_attention.ipynb) · [Python source](E2/run_e2.py) · [PDF report](reports/exercises.pdf).
 
@@ -52,8 +52,27 @@ This repository contains the course assignments for **CO5085**, Ho Chi Minh City
 
 - **Data:** CIFAR-100 (50,000 training and 10,000 test $32 \times 32$ color images across 100 classes, grouped into 20 coarse superclasses). Images are resized to $96 \times 96$ with ImageNet normalization and data augmentation. Training partition uses a stratified 40,000 / 10,000 split (400 train, 100 val per class).
 - **Approach:** Comprehensive benchmark between ResNet-18 (CNN) and Swin-T (Hierarchical Vision Transformer with Shifted Windows) across 4 training modes: `scratch`, `head` (Linear probe), `partial` (deep layer fine-tuning), and `full` (end-to-end fine-tuning).
-- **Saved results:** Swin-T full fine-tuning achieved validation accuracy **0.8281** and final test accuracy **0.8173** (81.73%) with macro F1 **0.8162** on 10,000 test images, outperforming ResNet-18 full fine-tuning (**0.7441**). Pretrained Swin-T leverages global context and ImageNet transfer learning exceptionally well. See [a1_results.json](reports/a1_results.json).
+- **Saved results:** Full fine-tuning achieved validation accuracy **0.8281** for Swin-T and **0.7441** for ResNet-18 on the same validation split. Only the selected Swin-T configuration was then evaluated on the 10,000-image official test set, reaching accuracy **0.8173** (81.73%) and macro F1 **0.8162**. See [a1_results.json](reports/a1_results.json).
 - **Files:** [Google Colab notebook](notebooks/a1_cnn_vs_transformer.ipynb) · [Python source](A1/run_a1.py) · [PDF report](CO5085%20Report%20Latex/a1_report.pdf) · [A1 Guide](A1/README.md).
+
+## Model architecture diagrams
+
+Both PDF reports include diagrams traced to the implemented models, with tensor shapes and classifier heads:
+
+- E1: [Softmax, MLP, and CNN](CO5085%20Report%20Latex/architecture/e1_classifiers.png).
+- E2: [Tokenizers and self-attention](CO5085%20Report%20Latex/architecture/e2_attention.png), including residual paths and mean pooling.
+- E3: [LSTM and GRU](CO5085%20Report%20Latex/architecture/e3_recurrent.png), with the final recurrent output used for classification.
+- A1: [ResNet-18](CO5085%20Report%20Latex/architecture/a1_resnet18.png) and [Swin-T](CO5085%20Report%20Latex/architecture/a1_swin_t.png), using the project's 96×96 input and 100-class heads.
+
+Regenerate the vector PDFs and PNG previews, then rebuild the reports:
+
+```bash
+python "CO5085 Report Latex/architecture/generate_architectures.py"
+cd "CO5085 Report Latex"
+latexmk -pdf -interaction=nonstopmode -halt-on-error report.tex a1_report.tex
+```
+
+After compilation, copy `CO5085 Report Latex/report.pdf` to `reports/exercises.pdf` so both published E1–E3 links serve the same report. The A1 diagrams follow the [torchvision ResNet](https://docs.pytorch.org/vision/stable/_modules/torchvision/models/resnet.html) and [Swin Transformer](https://docs.pytorch.org/vision/stable/_modules/torchvision/models/swin_transformer.html) implementations used by `A1/run_a1.py`.
 
 ## Run a notebook in Google Colab
 

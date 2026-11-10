@@ -7,6 +7,8 @@
 \usepackage{enumitem}
 \usepackage{caption,float}
 \usepackage[export]{adjustbox}
+\usepackage{xurl}
+\setlength{\emergencystretch}{2em}
 
 \geometry{paper=a4paper,left=2cm,right=2cm,top=1cm,bottom=1cm,includeheadfoot,headheight=34.8pt,headsep=12pt,footskip=30pt,asymmetric}
 \definecolor{myblue}{RGB}{33,102,172}
@@ -145,6 +147,11 @@ E1 requires three classifiers and a custom training loop. The shared loop in \te
 
 The Softmax classifier flattens an image into 784 pixel values and uses one linear layer with ten outputs. The MLP also flattens the image, then uses hidden layers of 128 and 64 values with ReLU activation. The CNN keeps the image grid. It applies convolution, ReLU, and max-pooling twice before a small fully connected head~[4]. Convolution helps the CNN learn local edges and clothing shapes from nearby pixels.
 
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{architecture/e1_classifiers.pdf}
+\caption{Implemented E1 architectures, drawn from \texttt{E1/run\_e1.py}. Shapes omit the batch dimension. All classifiers return logits directly to cross-entropy loss.}\label{fig:e1-architecture}
+\end{figure}
+
 \subsection{E1 Theory and Code Workflow}
 For the linear Softmax classifier, flattening gives $v\in\mathbb{R}^{784}$. The model computes $z=vW+b$, where $W\in\mathbb{R}^{784\times10}$ is a learned weight matrix and $b\in\mathbb{R}^{10}$ is a learned bias. This model can only make one linear decision boundary for each class.
 
@@ -212,6 +219,14 @@ Attention first needs a sequence of image tokens. The patch tokenizer cuts an im
 
 The manual MSA uses only linear layers, matrix multiplication, transpose, softmax, and reshape, following the scaled dot-product attention formulation~[6]. For tokens $X$, it forms $Q=XW_Q$, $K=XW_K$, and $V=XW_V$. Attention weights are $\mathrm{softmax}(QK^T/\sqrt{d})$ and the output is a weighted sum of $V$. The code splits 32 values into two heads, computes each head, and joins them. It does not call \texttt{nn.MultiheadAttention}. The next experiment uses PyTorch MSA with the same patch tokens and settings. The third experiment changes only the tokenizer to the CNN stem.
 
+\subsection{Implemented attention architecture}
+Figure~\ref{fig:e2-architecture} shows the complete classifier, including learned positions, both residual connections, post-attention LayerNorm, the feed-forward network, and mean pooling. The measured E2 runs are manual MSA with patch tokens, PyTorch MSA with patch tokens, and PyTorch MSA with CNN-stem tokens. Row tokenization is implemented and shape-tested, but is not one of the three measured runs in \texttt{e2\_results.json}.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{architecture/e2_attention.pdf}
+\caption{E2 tokenizers and the single attention block, matching \texttt{AttentionClassifier}. $N=49$ for patch/CNN-stem tokens and $N=28$ for row tokens. The model uses two heads of width 16 and no class token.}\label{fig:e2-architecture}
+\end{figure}
+
 \subsection{Scaled Dot-Product Attention}
 For an image token matrix $X\in\mathbb{R}^{49\times32}$, each row is one of 49 tokens and each token has 32 values. The model uses three learned projections:
 \[
@@ -272,6 +287,11 @@ E3 reads an image as a sequence instead of a grid. Each of the 28 image rows is 
 
 LSTM~[7] and GRU~[8] both use hidden size 64 and a final linear classifier. The last recurrent output predicts the clothing class. LSTM has separate gates and a cell state, so it has more parameters. GRU combines some gates, so it is smaller. The E1 CNN result is the image-grid baseline.
 
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{architecture/e3_recurrent.pdf}
+\caption{E3 LSTM and GRU architecture, drawn from \texttt{RowSequenceClassifier}. The classifier uses the last of 28 recurrent outputs, not an average of all time steps. The CNN baseline is the same architecture shown in Figure~\ref{fig:e1-architecture}.}\label{fig:e3-architecture}
+\end{figure}
+
 \subsection{LSTM and GRU Gates}
 Let $r_t\in\mathbb{R}^{28}$ be row $t$ of an image and $h_{t-1}$ be the hidden state from the previous row. The LSTM controls what to keep and forget with gates:
 \[
@@ -283,14 +303,16 @@ c_t&=f_t\odot c_{t-1}+i_t\odot g_t, & h_t&=o_t\odot\tanh(c_t).
 \]
 The sigmoid function $\sigma$ gives a value between 0 and 1, so gates can act like soft switches. The symbol $\odot$ means element-by-element multiplication. The cell state $c_t$ carries information through many steps; the hidden state $h_t$ is the output used at the next step.
 
-GRU uses fewer gates:
+GRU uses fewer gates. The following equations match the \texttt{nn.GRU} implementation used in E3~[9]; $q_t$ denotes the reset gate so that $r_t$ can continue to denote an image row:
 \[
 \begin{aligned}
-z_t&=\sigma(W_z[r_t,h_{t-1}]+b_z), & q_t&=\sigma(W_q[r_t,h_{t-1}]+b_q),\\
-\widetilde{h}_t&=\tanh(W_h[r_t,q_t\odot h_{t-1}]+b_h), & h_t&=(1-z_t)\odot h_{t-1}+z_t\odot\widetilde{h}_t.
+q_t&=\sigma(W_{iq}r_t+b_{iq}+W_{hq}h_{t-1}+b_{hq}),\\
+z_t&=\sigma(W_{iz}r_t+b_{iz}+W_{hz}h_{t-1}+b_{hz}),\\
+\widetilde{h}_t&=\tanh(W_{in}r_t+b_{in}+q_t\odot(W_{hn}h_{t-1}+b_{hn})),\\
+h_t&=(1-z_t)\odot\widetilde{h}_t+z_t\odot h_{t-1}.
 \end{aligned}
 \]
-The update gate $z_t$ decides how much new row information replaces the old hidden state. This smaller structure explains why the GRU has fewer parameters and finishes faster in the measured run.
+The update gate $z_t$ controls how much of the previous hidden state is retained. In PyTorch, the reset gate multiplies the transformed hidden-state term, including its bias. This placement differs from applying the reset gate to $h_{t-1}$ before the matrix multiplication. The smaller GRU structure explains its lower parameter count and shorter measured runtime.
 
 \subsubsection{Algorithm 3: Row-Sequence Classification}
 The following steps match \texttt{RowSequenceClassifier} and \texttt{train\_model} in \texttt{E3/run\_e3.py}.
@@ -355,5 +377,6 @@ The code is intentionally short and direct. It shows the essential steps: prepar
   \item A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin, ``Attention Is All You Need,'' in \textit{Advances in Neural Information Processing Systems (NeurIPS)}, 2017. \url{https://arxiv.org/abs/1706.03762}.
   \item S. Hochreiter and J. Schmidhuber, ``Long Short-Term Memory,'' \textit{Neural Computation}, vol. 9, no. 8, pp. 1735--1780, 1997.
   \item K. Cho et al., ``Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation,'' in \textit{Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)}, pp. 1724--1734, 2014.
+  \item PyTorch, ``GRU: equations and implementation notes.'' \url{https://docs.pytorch.org/docs/2.12/generated/torch.nn.GRU.html}.
 \end{enumerate}
 \end{document}

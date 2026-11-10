@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="CO5085 Coursework Exercises E1-E3 and Assignment A1: CNN versus Transformer Benchmark on CIFAR-100.">
-    <title>CO5085 | Deep Learning and Applications in Computer Vision</title>
+    <title>CO5085 | Deep Learning and Its Applications in Computer Vision</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
@@ -16,7 +16,6 @@
       <nav aria-label="Main navigation">
         <a href="#quick-links">Deliverables</a>
         <a href="#exercises">Tasks (E1–A1)</a>
-        <a href="#results">A1 Winner</a>
         <a href="#reproduce">Reproduce</a>
       </nav>
       <a class="repo-link" href="https://github.com/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision" target="_blank" rel="noopener">GitHub Repository</a>
@@ -25,7 +24,7 @@
     <main id="top">
       <section class="hero">
         <p class="eyebrow">HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY — VIETNAM NATIONAL UNIVERSITY HO CHI MINH CITY</p>
-        <h1>From Pixels<br><span class="title-accent">to Visual Foundation Models.</span></h1>
+        <h1>Deep Learning <span class="title-accent">and Its Applications in Computer Vision</span></h1>
         <p class="summary">Master's coursework submission for <strong>CO5085</strong>: E1–E3 explore classical classifiers, custom self-attention, and sequence modeling on Fashion-MNIST; A1 benchmarks ResNet-18 vs Swin-T on CIFAR-100 across 4 transfer learning regimes.</p>
 
         <div class="hero-info-grid">
@@ -94,7 +93,7 @@
               </tr>
               <tr>
                 <td><strong>E2: Attention</strong></td>
-                <td>Fashion-MNIST: Manual Multi-Head Self-Attention vs PyTorch MSA, patch/stem/row tokenizers</td>
+                <td>Fashion-MNIST: Manual vs PyTorch MSA with patch and CNN-stem tokens; row tokenizer also implemented</td>
                 <td>PyTorch MSA + CNN Stem (<strong>75.78%</strong>)</td>
                 <td><a href="reports/exercises.pdf" target="_blank"><strong>Exercises Report (PDF)</strong></a></td>
                 <td>
@@ -130,21 +129,6 @@
         </div>
       </section>
 
-      <section class="result-strip" id="results" aria-label="Main result">
-        <p>A1 Selected Winner</p>
-        <strong>81.73%</strong>
-        <span>Swin-T full fine-tune test accuracy (81.62% Macro-F1)</span>
-        <span class="result-note">CIFAR-100 · 10,000 test images · seed 42 · ImageNet transfer</span>
-      </section>
-
-      <section class="method-note">
-        <div>
-          <p class="section-label">Shared experiment protocol</p>
-          <h2>Honest splits, zero leakage.</h2>
-        </div>
-        <p>E1–E3 share an identical 48,000 / 12,000 / 10,000 Fashion-MNIST split with fixed seed 42. A1 uses a stratified 40,000 / 10,000 split of CIFAR-100 (400 train, 100 val per fine class), reserving the official untouched 10,000-image test set for the single validation winner. All reported numbers reflect executed runs.</p>
-      </section>
-
       <section class="exercise-grid" id="exercises">
         <article>
           <p class="exercise-number">E1</p>
@@ -167,7 +151,7 @@
         <article>
           <p class="exercise-number">E2</p>
           <h2>Transformer Attention</h2>
-          <p>Manual Multi-Head Self-Attention is coded from basic matrix ops and benchmarked against PyTorch MSA across 3 tokenizers.</p>
+          <p>Manual Multi-Head Self-Attention is compared with PyTorch MSA using patch tokens; a third run uses PyTorch MSA with a CNN stem. Row tokenization is also implemented.</p>
           <dl>
             <div><dt>Selected Model</dt><dd>PyTorch MSA + CNN Stem</dd></div>
             <div><dt>Test Accuracy</dt><dd>75.78% (Manual: 70.61%)</dd></div>
@@ -207,7 +191,7 @@
           <dl>
             <div><dt>Selected Model</dt><dd>Swin-T Full Fine-tune</dd></div>
             <div><dt>Test Acc / Macro-F1</dt><dd>81.73% / 81.62%</dd></div>
-            <div><dt>Comparison</dt><dd>Swin-T 81.7% vs ResNet 74.4%</dd></div>
+            <div><dt>Validation Accuracy (Full Fine-tuning)</dt><dd>Swin-T 82.81% · ResNet-18 74.41%</dd></div>
           </dl>
           <div class="badge-row">
             <a href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/notebooks/a1_cnn_vs_transformer.ipynb" target="_blank" rel="noopener">

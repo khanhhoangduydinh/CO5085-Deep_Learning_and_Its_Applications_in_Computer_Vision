@@ -7,6 +7,8 @@
 \usepackage{enumitem}
 \usepackage{caption,float}
 \usepackage[export]{adjustbox}
+\usepackage{xurl}
+\setlength{\emergencystretch}{2em}
 
 \geometry{paper=a4paper,left=2cm,right=2cm,top=1cm,bottom=1cm,includeheadfoot,headheight=34.8pt,headsep=12pt,footskip=30pt,asymmetric}
 \definecolor{myblue}{RGB}{33,102,172}
@@ -103,7 +105,7 @@ This project uses CIFAR-100. The code compares ResNet-18, a CNN, with Swin-T, a 
 \clearpage
 \subsection*{A1 requirement checklist}
 \addcontentsline{toc}{subsection}{A1 requirement checklist}
-\begin{tabularx}{\textwidth}{>{\bfseries}p{3.4cm}X}\toprule
+\noindent\begin{tabularx}{\textwidth}{>{\bfseries}p{3.4cm}X}\toprule
 \textbf{Assignment requirement} & \textbf{Evidence in this project} \\\midrule
 Large public image dataset & CIFAR-100 has 50,000 official training images, 10,000 official test images, and 100 fine classes. \\
 CNN and Transformer & ResNet-18 is the CNN; Swin-T is the Transformer. \\
@@ -157,6 +159,11 @@ The shortcut $+x$ gives a direct path for information and gradients. In simple w
 
 The torchvision ResNet-18 starts with an ImageNet classifier head containing 1,000 outputs. The code replaces that head with \texttt{nn.Linear(..., 100)}. This replacement is necessary because CIFAR-100 has 100 classes. In a frozen-backbone run, BatchNorm layers without trainable parameters are kept in evaluation mode. Their running mean and variance then remain frozen as well.
 
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{architecture/a1_resnet18.pdf}
+\caption{ResNet-18 as instantiated by \texttt{build\_model} in \texttt{A1/run\_a1.py}, following torchvision~[6]. The original stem is retained, the input is resized to $96\times96$, and the final classifier has 100 outputs. Tensor shapes use $C\times H\times W$ and omit the batch dimension.}\label{fig:a1-resnet-architecture}
+\end{figure}
+
 \subsection{Swin-T: the Transformer model}
 Swin-T is a hierarchical vision Transformer based on shifted local windows~[3]. First, the image is divided into non-overlapping patches. A patch is flattened and projected to a token vector:
 \[
@@ -173,6 +180,13 @@ Inside one local window, scaled dot-product attention is
 The product $QK^T$ compares one token with other tokens. Softmax converts comparisons to weights, and the weighted sum of $V$ shares useful information. Using local windows avoids computing attention across every image patch at once. In the next block, shifted windows change the window boundaries, so information can pass between neighboring windows. This is the main Swin idea: it keeps attention efficient while building a larger visual context across stages.
 
 Like ResNet, Swin-T has a final ImageNet head with 1,000 outputs. The code replaces \texttt{model.head} with a 100-output linear layer. Swin-T has more parameters than ResNet-18 and needs more memory/time, but it can use relations between patches through attention.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{architecture/a1_swin_t.pdf}
+\caption{Swin-T as instantiated for A1, with stage depths $[2,2,6,2]$, head counts $[3,6,12,24]$, and a 100-class head. Stage shapes use $H\times W\times C$. This diagram follows torchvision's Swin-T implementation rather than a generic $224\times224$ ImageNet diagram.}\label{fig:a1-swin-architecture}
+\end{figure}
+
+At the project's $96\times96$ input size, the four stage grids are $24\times24$, $12\times12$, $6\times6$, and $3\times3$. Window attention pads these grids to multiples of seven and removes the padding afterward. In the last two stages the padded grid fits one window, so torchvision disables the spatial shift there. Patch merging separately reduces the grid size between stages. The final LayerNorm and global average pooling produce 768 features before the new 100-class head. In \texttt{partial} mode, only \texttt{features[-1]} and \texttt{head} train; the final LayerNorm remains frozen. These details are visible in Figure~\ref{fig:a1-swin-architecture} and follow the torchvision implementation~[7].
 
 \subsection{Why pretrained weights matter}
 ImageNet pretraining gives parameters $\theta_0$ that have already learned general visual patterns from a large image dataset. A random model instead starts at random $\theta_{\mathrm{random}}$. During fine-tuning, gradient-based optimization updates trainable parameters:
@@ -218,7 +232,7 @@ The following steps correspond directly to \texttt{A1/run\_a1.py}.
   \item For one experiment row, call \texttt{build\_model}. It loads ResNet-18 or Swin-T, optionally loads ImageNet weights, replaces the classifier by 100 outputs, and applies the selected freeze mode.
   \item Count parameters with \texttt{requires\_grad=True}. Start the timer and reset GPU peak-memory statistics.
   \item For each of three epochs, read a batch, move images and labels to CUDA, call the model, and get 100 logits per image.
-  \item Compute \texttt{CrossEntropyLoss}. Clear old gradients with \texttt{zero\_grad()}, call \texttt{loss.backward()}, then call \texttt{optimizer.step()}.
+  \item Compute \texttt{CrossEntropyLoss}. Clear gradients with \texttt{zero\_grad()}, call \texttt{loss.backward()}, then call \texttt{optimizer.step()}.
   \item Switch to evaluation mode and calculate validation loss and accuracy without gradients. Keep a CPU copy of the weights when validation accuracy improves.
   \item Repeat Steps 3--7 for all eight rows. Do not inspect the official test partition while choosing a row.
   \item Select the largest validation accuracy using \texttt{select\_best\_experiment}. Load its saved best-validation weights and evaluate the official test partition only after selection.
@@ -322,5 +336,7 @@ The code keeps the learning steps visible: make a balanced split, load and augme
   \item Z. Liu et al., ``Swin Transformer: Hierarchical Vision Transformer using Shifted Windows,'' 2021. \url{https://arxiv.org/abs/2103.14030}.
   \item PyTorch, ``Torchvision models and pre-trained weights.'' \url{https://docs.pytorch.org/vision/stable/models.html}.
   \item Hugging Face, ``uoft-cs/cifar100 dataset repository.'' \url{https://huggingface.co/datasets/uoft-cs/cifar100}.
+  \item PyTorch, ``Torchvision ResNet source code.'' \url{https://docs.pytorch.org/vision/stable/_modules/torchvision/models/resnet.html}.
+  \item PyTorch, ``Torchvision Swin Transformer source code.'' \url{https://docs.pytorch.org/vision/stable/_modules/torchvision/models/swin_transformer.html}.
 \end{enumerate}
 \end{document}
