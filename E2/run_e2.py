@@ -58,6 +58,18 @@ class CNNStemTokenizer(nn.Module):
         return features.flatten(start_dim=2).transpose(1, 2)
 
 
+class RowTokenizer(nn.Module):
+    """Treat each of the 28 image rows as one token (28 tokens of 28 pixels)."""
+
+    def __init__(self, embed_dim=32):
+        super().__init__()
+        self.project = nn.Linear(28, embed_dim)
+
+    def forward(self, images):
+        rows = images.squeeze(1)
+        return self.project(rows)
+
+
 class ManualMSA(nn.Module):
     """Multi-head self-attention built from Linear layers and matrix products."""
 
@@ -93,9 +105,19 @@ class AttentionClassifier(nn.Module):
 
     def __init__(self, attention_kind="manual", token_kind="patch", embed_dim=32, heads=2):
         super().__init__()
-        self.tokenizer = PatchTokenizer(embed_dim) if token_kind == "patch" else CNNStemTokenizer(embed_dim)
-        token_count = 49
-        self.position = nn.Parameter(torch.zeros(1, token_count, embed_dim))
+        if token_kind == "patch":
+            self.tokenizer = PatchTokenizer(embed_dim)
+            token_count = 49
+        elif token_kind == "cnn":
+            self.tokenizer = CNNStemTokenizer(embed_dim)
+            token_count = 49
+        elif token_kind in {"row", "pixel_row"}:
+            self.tokenizer = RowTokenizer(embed_dim)
+            token_count = 28
+        else:
+            raise ValueError(f"Unknown token_kind: {token_kind}")
+
+        self.position = nn.Parameter(torch.zeros(1, max(token_count, 49), embed_dim))
         self.attention_kind = attention_kind
         self.attention = ManualMSA(embed_dim, heads) if attention_kind == "manual" else nn.MultiheadAttention(
             embed_dim, heads, batch_first=True

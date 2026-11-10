@@ -56,14 +56,17 @@ FACULTY OF COMPUTER SCIENCE AND ENGINEERING
 \end{figure}
 \vspace{0.4cm}
 \begin{center}
-\begin{tabular}{c}
-\multicolumn{1}{c}{\textbf{\Large CO5085 EXERCISES REPORT}}\\
-~~\\ \hline \\[-2pt]
-\textbf{\large DEEP LEARNING AND ITS APPLICATIONS}\\
-\textbf{\large IN COMPUTER VISION}\\[4pt]
-\textbf{\large \textit{Group: Traiblazer}}\\[-2pt]
-\hline
-\end{tabular}
+{\textbf{\Large CO5085 EXERCISES REPORT}}\par
+\vspace{0.8cm}
+\rule{0.9\textwidth}{0.8pt}\par
+\vspace{0.55cm}
+{\textbf{\large DEEP LEARNING AND ITS APPLICATIONS}}\par
+\vspace{0.25cm}
+{\textbf{\large IN COMPUTER VISION}}\par
+\vspace{0.35cm}
+{\textbf{\large \textit{Group: Traiblazer}}}\par
+\vspace{0.45cm}
+\rule{0.9\textwidth}{0.8pt}
 \end{center}
 \vspace{0.9cm}
 \begin{table}[h]\centering
@@ -92,16 +95,16 @@ FACULTY OF COMPUTER SCIENCE AND ENGINEERING
 
 \section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
-This report completes Exercises E1, E2, and E3 of CO5085 with one shared small dataset: Fashion-MNIST. Fashion-MNIST contains $28\times28$ grayscale clothing images in ten classes. It is allowed by the exercise sheet, visually more varied than handwritten digits, and small enough for a beginner to run on a personal computer.
+This report completes Exercises E1, E2, and E3 of CO5085 with one shared small dataset: Fashion-MNIST~[1]. Fashion-MNIST contains $28\times28$ grayscale clothing images in ten classes. It is allowed by the exercise sheet, visually more varied than handwritten digits, and small enough for a beginner to run on a personal computer.
 
-The official 60,000 training images are shuffled with seed 42, then split into 48,000 training images and 12,000 validation images. The official 10,000 test images are kept for final evaluation. The same split is used in every exercise, so comparisons are fair. All models use Adam with learning rate 0.001, batch size 256, and cross-entropy loss. E1 and E3 use three epochs. E2 uses two epochs because it contains three attention experiments. These short runs compare designs clearly; they do not claim a fully optimized benchmark score.
+The official 60,000 training images are shuffled with seed 42, then split into 48,000 training images and 12,000 validation images. The official 10,000 test images are kept for final evaluation. The same split is used in every exercise, so comparisons are fair. All models use Adam~[2] with learning rate 0.001, batch size 256, and cross-entropy loss. E1 and E3 use three epochs. E2 uses two epochs because it contains three attention experiments. These short runs compare designs clearly; they do not claim a fully optimized benchmark score.
 
 \begin{importantbox}
 \textbf{How to read the results.} Validation accuracy is used during training to compare choices. Test accuracy is reported after an experiment completes. A parameter count is the number of learned values in a model. A confusion matrix shows which classes are confused instead of only showing one average score.
 \end{importantbox}
 
 \subsection*{Reproducibility and AI-use declaration}
-The project uses direct PyTorch code. Run \texttt{python -m E1.run\_e1}, \texttt{python -m E2.run\_e2}, and \texttt{python -m E3.run\_e3} from the repository root. The first run downloads Fashion-MNIST. Figures and JSON metrics are saved in \texttt{reports/}. AI assistance was used to help organize code and explain concepts. The student reviewed the code, ran the experiments, and is responsible for understanding and defending every model, result, and conclusion in this report.
+The project uses direct PyTorch~[3] code. Run \texttt{python -m E1.run\_e1}, \texttt{python -m E2.run\_e2}, and \texttt{python -m E3.run\_e3} from the repository root. The first run downloads Fashion-MNIST. Figures and JSON metrics are saved in \texttt{reports/}. AI assistance was used to help organize code and explain concepts. The student reviewed the code, ran the experiments, and is responsible for understanding and defending every model, result, and conclusion in this report.
 
 \subsection*{Shared Learning Workflow and Notation}
 \addcontentsline{toc}{subsection}{Shared Learning Workflow and Notation}
@@ -140,7 +143,7 @@ The following steps match \texttt{get\_loaders}, \texttt{train\_epoch}, and \tex
 \subsection{Objective and model design}
 E1 requires three classifiers and a custom training loop. The shared loop in \texttt{common.py} is explicit: for each batch it predicts scores, computes cross-entropy loss, calls \texttt{loss.backward()}, then calls \texttt{optimizer.step()}. This makes the learning process visible instead of hiding it inside a high-level trainer.
 
-The Softmax classifier flattens an image into 784 pixel values and uses one linear layer with ten outputs. The MLP also flattens the image, then uses hidden layers of 128 and 64 values with ReLU activation. The CNN keeps the image grid. It applies convolution, ReLU, and max-pooling twice before a small fully connected head. Convolution helps the CNN learn local edges and clothing shapes from nearby pixels.
+The Softmax classifier flattens an image into 784 pixel values and uses one linear layer with ten outputs. The MLP also flattens the image, then uses hidden layers of 128 and 64 values with ReLU activation. The CNN keeps the image grid. It applies convolution, ReLU, and max-pooling twice before a small fully connected head~[4]. Convolution helps the CNN learn local edges and clothing shapes from nearby pixels.
 
 \subsection{E1 Theory and Code Workflow}
 For the linear Softmax classifier, flattening gives $v\in\mathbb{R}^{784}$. The model computes $z=vW+b$, where $W\in\mathbb{R}^{784\times10}$ is a learned weight matrix and $b\in\mathbb{R}^{10}$ is a learned bias. This model can only make one linear decision boundary for each class.
@@ -200,14 +203,14 @@ The CNN confusion matrix in Figure~\ref{fig:e1-confusion} is calculated from the
 \clearpage
 \section{E2 -- Multi-Head Self-Attention for Images}
 \subsection{Tokens and attention}
-Attention first needs a sequence of image tokens. The patch tokenizer cuts an image into 49 non-overlapping $4\times4$ patches and projects each patch to 32 values. The CNN-stem tokenizer uses two small convolution-and-pooling stages, then converts its $7\times7$ feature map into 49 tokens. The sequence length is the same, but the CNN stem supplies tokens that already contain local visual features.
+Attention first needs a sequence of image tokens. The patch tokenizer cuts an image into 49 non-overlapping $4\times4$ patches and projects each patch to 32 values, drawing on Vision Transformer tokenization~[5]. The CNN-stem tokenizer uses two small convolution-and-pooling stages, then converts its $7\times7$ feature map into 49 tokens. The sequence length is the same, but the CNN stem supplies tokens that already contain local visual features. Additionally, the codebase implements a third representation, \texttt{RowTokenizer}, converting each 28-pixel row into a token and directly connecting with the sequential image modeling in E3.
 
 \begin{figure}[H]\centering
 \includegraphics[width=0.52\textwidth]{images/e2_01_patch_tokens.png}
 \caption{One image divided into 49 patch tokens.}\label{fig:e2-tokens}
 \end{figure}
 
-The manual MSA uses only linear layers, matrix multiplication, transpose, softmax, and reshape. For tokens $X$, it forms $Q=XW_Q$, $K=XW_K$, and $V=XW_V$. Attention weights are $\mathrm{softmax}(QK^T/\sqrt{d})$ and the output is a weighted sum of $V$. The code splits 32 values into two heads, computes each head, and joins them. It does not call \texttt{nn.MultiheadAttention}. The next experiment uses PyTorch MSA with the same patch tokens and settings. The third experiment changes only the tokenizer to the CNN stem.
+The manual MSA uses only linear layers, matrix multiplication, transpose, softmax, and reshape, following the scaled dot-product attention formulation~[6]. For tokens $X$, it forms $Q=XW_Q$, $K=XW_K$, and $V=XW_V$. Attention weights are $\mathrm{softmax}(QK^T/\sqrt{d})$ and the output is a weighted sum of $V$. The code splits 32 values into two heads, computes each head, and joins them. It does not call \texttt{nn.MultiheadAttention}. The next experiment uses PyTorch MSA with the same patch tokens and settings. The third experiment changes only the tokenizer to the CNN stem.
 
 \subsection{Scaled Dot-Product Attention}
 For an image token matrix $X\in\mathbb{R}^{49\times32}$, each row is one of 49 tokens and each token has 32 values. The model uses three learned projections:
@@ -267,7 +270,7 @@ E3 reads an image as a sequence instead of a grid. Each of the 28 image rows is 
 \caption{Rows marked as time steps for LSTM and GRU.}\label{fig:e3-rows}
 \end{figure}
 
-LSTM and GRU both use hidden size 64 and a final linear classifier. The last recurrent output predicts the clothing class. LSTM has separate gates and a cell state, so it has more parameters. GRU combines some gates, so it is smaller. The E1 CNN result is the image-grid baseline.
+LSTM~[7] and GRU~[8] both use hidden size 64 and a final linear classifier. The last recurrent output predicts the clothing class. LSTM has separate gates and a cell state, so it has more parameters. GRU combines some gates, so it is smaller. The E1 CNN result is the image-grid baseline.
 
 \subsection{LSTM and GRU Gates}
 Let $r_t\in\mathbb{R}^{28}$ be row $t$ of an image and $h_{t-1}$ be the hidden state from the previous row. The LSTM controls what to keep and forget with gates:
@@ -331,7 +334,7 @@ One shared dataset & Fashion-MNIST and the same 48,000/12,000/10,000 split are u
 E1 models and errors & \texttt{E1/run\_e1.py}, Table~\ref{tab:e1-results}, curves, confusion matrix, and error samples. \\
 Manual training loop & \texttt{common.py} explicitly runs forward, loss, backward, and optimizer step. \\
 Manual and library MSA & \texttt{ManualMSA} uses matrix operations; the library comparison uses \texttt{nn.MultiheadAttention}. \\
-Two tokenizations & Patch tokens and CNN-stem feature-map tokens; Table~\ref{tab:e2-results}. \\
+Multiple tokenizations & Patch, CNN-stem, and row tokenizers in \texttt{E2/run\_e2.py}; Table~\ref{tab:e2-results}. \\
 LSTM, GRU, baseline & \texttt{E3/run\_e3.py} compares both recurrent units with the E1 CNN. \\
 Reproducible delivery & Code, figures, JSON results, README, GitHub Pages source, and this PDF are stored together. \\\bottomrule
 \end{tabularx}\end{table}
@@ -339,4 +342,18 @@ Reproducible delivery & Code, figures, JSON results, README, GitHub Pages source
 This project shows three ways to classify the same images. Softmax is the simplest baseline, the MLP learns nonlinear pixel combinations, and the CNN is strongest because it keeps the image layout. Manual attention agrees closely with PyTorch MSA, and CNN-stem tokens improve over raw patches. LSTM and GRU show how to read an image as a sequence, but CNN remains more suitable for this image dataset.
 
 The code is intentionally short and direct. It shows the essential steps: prepare data, define a model, train with forward and backward propagation, evaluate a held-out test set, and inspect errors. Future work could add more epochs, augmentation, a deeper CNN, or a larger attention model. Those changes are outside this beginner-level submission.
+
+\clearpage
+\section*{References}
+\addcontentsline{toc}{section}{References}
+\begin{enumerate}[leftmargin=7mm,label={[\arabic*]}]
+  \item H. Xiao, K. Rasul, and R. Vollgraf, ``Fashion-MNIST: a Novel Image Dataset for Benchmarking Machine Learning Algorithms,'' arXiv:1708.07747, 2017. \url{https://github.com/zalandoresearch/fashion-mnist}.
+  \item D. P. Kingma and J. Ba, ``Adam: A Method for Stochastic Optimization,'' in \textit{Proceedings of the 3rd International Conference on Learning Representations (ICLR)}, 2015. \url{https://arxiv.org/abs/1412.6980}.
+  \item A. Paszke et al., ``PyTorch: An Imperative Style, High-Performance Deep Learning Library,'' in \textit{Advances in Neural Information Processing Systems (NeurIPS)}, 2019. \url{https://pytorch.org}.
+  \item Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner, ``Gradient-based learning applied to document recognition,'' \textit{Proceedings of the IEEE}, vol. 86, no. 11, pp. 2278--2324, 1998.
+  \item A. Dosovitskiy et al., ``An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale,'' in \textit{Proceedings of the 9th International Conference on Learning Representations (ICLR)}, 2021. \url{https://arxiv.org/abs/2010.11929}.
+  \item A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser, and I. Polosukhin, ``Attention Is All You Need,'' in \textit{Advances in Neural Information Processing Systems (NeurIPS)}, 2017. \url{https://arxiv.org/abs/1706.03762}.
+  \item S. Hochreiter and J. Schmidhuber, ``Long Short-Term Memory,'' \textit{Neural Computation}, vol. 9, no. 8, pp. 1735--1780, 1997.
+  \item K. Cho et al., ``Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation,'' in \textit{Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)}, pp. 1724--1734, 2014.
+\end{enumerate}
 \end{document}

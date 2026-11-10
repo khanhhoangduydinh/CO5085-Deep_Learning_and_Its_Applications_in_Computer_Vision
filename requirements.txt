@@ -3,5 +3,6 @@ torchvision
 datasets
 numpy
 matplotlib
+seaborn
 scikit-learn
 pytest

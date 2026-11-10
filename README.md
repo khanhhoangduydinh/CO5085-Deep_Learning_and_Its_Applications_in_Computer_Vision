@@ -13,6 +13,8 @@ Repository: [CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision](https
 
 ## Run the code
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/CO5085_Exercises_E1_E2_E3.ipynb)
+
 ```bash
 pip install -r requirements.txt
 python -m E1.run_e1
@@ -21,10 +23,12 @@ python -m E3.run_e3
 python -m A1.run_a1
 ```
 
-Run commands from the repository root. Fashion-MNIST or CIFAR-100 downloads automatically on first use. Each script writes figures and JSON metrics to `reports/`. A1 also downloads official torchvision ImageNet weights on first use.
+Run commands from the repository root, or open [`CO5085_Exercises_E1_E2_E3.ipynb`](CO5085_Exercises_E1_E2_E3.ipynb) to execute interactively on Google Colab with line-by-line pedagogical explanations. Fashion-MNIST or CIFAR-100 downloads automatically on first use. Each script writes figures and JSON metrics to `reports/`. A1 also downloads official torchvision ImageNet weights on first use.
 
 ## Report and website
 
+- [Interactive Colab Notebook (E1–E3)](CO5085_Exercises_E1_E2_E3.ipynb)
+- [E1-E3 PDF report (exercises.pdf)](reports/exercises.pdf)
 - [LaTeX source](CO5085%20Report%20Latex/report.tex)
 - [PDF report](CO5085%20Report%20Latex/report.pdf)
 - [A1 LaTeX source](CO5085%20Report%20Latex/a1_report.tex)

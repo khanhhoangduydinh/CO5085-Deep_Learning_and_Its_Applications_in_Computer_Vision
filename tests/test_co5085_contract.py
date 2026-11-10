@@ -6,7 +6,7 @@ import torch
 
 from common import make_split_indices
 from E1.run_e1 import CNNClassifier, MLPClassifier, SoftmaxClassifier
-from E2.run_e2 import CNNStemTokenizer, ManualMSA, PatchTokenizer
+from E2.run_e2 import AttentionClassifier, CNNStemTokenizer, ManualMSA, PatchTokenizer, RowTokenizer
 from E3.run_e3 import RowSequenceClassifier
 from A1.run_a1 import (
     EXPERIMENTS,
@@ -44,17 +44,23 @@ def test_manual_attention_preserves_token_shape():
     assert attention(tokens).shape == tokens.shape
 
 
-def test_two_tokenizers_create_tokens_for_one_fashion_image_batch():
-    """Patch and CNN-stem tokenizers must both produce usable token sequences."""
+def test_tokenizers_create_tokens_for_one_fashion_image_batch():
+    """Patch, CNN-stem, and row tokenizers must produce usable token sequences."""
     images = torch.zeros(2, 1, 28, 28)
 
     patch_tokens = PatchTokenizer(embed_dim=32)(images)
     stem_tokens = CNNStemTokenizer(embed_dim=32)(images)
+    row_tokens = RowTokenizer(embed_dim=32)(images)
 
     assert patch_tokens.shape == (2, 49, 32)
     assert stem_tokens.shape[0] == 2
     assert stem_tokens.shape[2] == 32
     assert stem_tokens.shape[1] > 1
+    assert row_tokens.shape == (2, 28, 32)
+
+    # All tokenizers must work seamlessly with AttentionClassifier
+    assert AttentionClassifier("manual", "row")(images).shape == (2, 10)
+    assert AttentionClassifier("pytorch", "patch")(images).shape == (2, 10)
 
 
 def test_lstm_and_gru_return_ten_class_scores():
@@ -74,11 +80,13 @@ def test_pages_links_point_to_existing_submission_files():
         "E1/run_e1.py",
         "E2/run_e2.py",
         "E3/run_e3.py",
+        "reports/exercises.pdf",
         "CO5085%20Report%20Latex/report.pdf",
     ]:
         assert path in page
 
     assert (root / "CO5085 Report Latex" / "report.pdf").is_file()
+    assert (root / "reports" / "exercises.pdf").is_file()
 
 
 def test_public_links_use_the_full_course_repository_name():
@@ -103,6 +111,7 @@ def test_report_maps_formulas_and_algorithms_to_all_three_exercises():
         "Algorithm 2: Manual Multi-Head Self-Attention",
         "LSTM and GRU Gates",
         "Algorithm 3: Row-Sequence Classification",
+        "References",
     ]:
         assert heading in report
 
@@ -207,3 +216,27 @@ def test_a1_submission_links_and_report_source_are_published():
         "Measured Results and Discussion",
     ]:
         assert heading in report_text
+
+
+def test_colab_notebook_and_exercise_report_artifacts():
+    """Verify that the beginner-friendly Colab notebook and exercise PDF report exist."""
+    import json
+
+    root = Path(__file__).parents[1]
+    notebook_path = root / "CO5085_Exercises_E1_E2_E3.ipynb"
+    assert notebook_path.is_file(), "CO5085_Exercises_E1_E2_E3.ipynb must exist at project root"
+
+    nb_data = json.loads(notebook_path.read_text(encoding="utf-8"))
+    assert "cells" in nb_data
+    assert len(nb_data["cells"]) >= 20, "Notebook should have comprehensive breakdown cells"
+
+    # Check that required exercises E1, E2, E3 are covered
+    nb_text = notebook_path.read_text(encoding="utf-8")
+    for keyword in ["Bài tập E1", "Bài tập E2", "Bài tập E3", "Fashion-MNIST", "SoftmaxClassifier", "ManualMSA", "RowSequenceClassifier"]:
+        assert keyword in nb_text, f"Notebook must contain explanation for {keyword}"
+
+    # Verify reports/exercises.pdf exists and is non-empty
+    exercise_pdf = root / "reports" / "exercises.pdf"
+    assert exercise_pdf.is_file(), "reports/exercises.pdf must exist for submission"
+    assert exercise_pdf.stat().st_size > 10_000, "reports/exercises.pdf must be a valid compiled PDF"
+

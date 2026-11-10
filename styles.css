@@ -41,6 +41,9 @@ h2 { font-size: clamp(1.5rem, 3vw, 2.3rem); line-height: 1.05; letter-spacing: -
 .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin: 32px 0; font-size: .8rem; font-weight: 700; }
 .hero-meta span { padding: 7px 11px; border: 1px solid var(--line); background: rgba(255,255,255,.54); }
 .primary-action { display: inline-block; background: var(--cobalt); color: white; padding: 13px 20px; text-decoration: none; font-weight: 700; }
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.secondary-action { display: inline-block; border: 2px solid var(--cobalt); color: var(--cobalt); padding: 11px 18px; text-decoration: none; font-weight: 700; }
+.secondary-action:hover { background: var(--wash); text-decoration: none; }
 .result-strip { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 22px; padding: 30px 36px; color: white; background: var(--ink); }
 .result-strip p, .result-strip strong, .result-strip span { margin: 0; }
 .result-strip strong { font-size: clamp(2.6rem, 7vw, 5.4rem); letter-spacing: -.08em; line-height: .8; color: #fff; }
