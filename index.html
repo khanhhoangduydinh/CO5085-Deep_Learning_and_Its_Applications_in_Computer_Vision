@@ -3,95 +3,217 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="CO5085 E1-E3 exercises and A1 CNN versus Transformer comparison on CIFAR-100.">
-    <title>CO5085 | Exercises and A1</title>
+    <meta name="description" content="CO5085 Coursework Exercises E1-E3 and Assignment A1: CNN versus Transformer Benchmark on CIFAR-100.">
+    <title>CO5085 | Deep Learning and Applications in Computer Vision</title>
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <header class="site-header">
-      <a class="identity" href="#top">HCMUT <span>CO5085</span></a>
+      <a class="identity" href="#top" aria-label="CO5085 - Home">
+        <img class="brand-logo" src="assets/logo-bachkhoa.png" alt="Logo Bach Khoa HCMUT">
+        <span>KHANH HOANG DUY DINH · CO5085</span>
+      </a>
       <nav aria-label="Main navigation">
-        <a href="#exercises">Exercises E1–E3</a>
-        <a href="#results">A1 result</a>
-        <a href="#reproduce">Run it</a>
+        <a href="#quick-links">Deliverables</a>
+        <a href="#exercises">Tasks (E1–A1)</a>
+        <a href="#results">A1 Winner</a>
+        <a href="#reproduce">Reproduce</a>
       </nav>
-      <a class="repo-link" href="https://github.com/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision">GitHub repository</a>
+      <a class="repo-link" href="https://github.com/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision" target="_blank" rel="noopener">GitHub Repository</a>
     </header>
 
     <main id="top">
       <section class="hero">
-        <p class="course-line">Deep Learning and Its Applications in Computer Vision</p>
-        <h1>From pixels<br>to visual models.</h1>
-        <p class="summary">A beginner-level CO5085 submission: E1-E3 explore Fashion-MNIST, and A1 compares a CNN with a Transformer on the 100-class CIFAR-100 dataset.</p>
-        <div class="hero-meta">
-          <span>A1: 40,000 training images</span>
-          <span>A1: 10,000 validation images</span>
-          <span>CIFAR-100: 100 classes</span>
+        <p class="eyebrow">HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY — VIETNAM NATIONAL UNIVERSITY HO CHI MINH CITY</p>
+        <h1>From Pixels<br><span class="title-accent">to Visual Foundation Models.</span></h1>
+        <p class="summary">Master's coursework submission for <strong>CO5085</strong>: E1–E3 explore classical classifiers, custom self-attention, and sequence modeling on Fashion-MNIST; A1 benchmarks ResNet-18 vs Swin-T on CIFAR-100 across 4 transfer learning regimes.</p>
+
+        <div class="hero-info-grid">
+          <aside class="course-info" aria-label="Course information">
+            <span class="info-card-label">COURSE INFORMATION</span>
+            <p><strong>University:</strong> Ho Chi Minh City University of Technology (HCMUT) - VNU-HCM</p>
+            <p><strong>Faculty:</strong> Faculty of Computer Science and Engineering (CSE)</p>
+            <p><strong>Course:</strong> Deep Learning and Its Applications in Computer Vision (CO5085)</p>
+            <p><strong>Semester:</strong> HK261 (2026–2027)</p>
+            <p><strong>Lecturers:</strong> Dr. Le Thanh Sach, Dr. Nguyen Quoc Minh</p>
+          </aside>
+          <aside class="course-info personal-info" aria-label="Personal information">
+            <span class="info-card-label">PERSONAL INFORMATION</span>
+            <p><strong>Group:</strong> Trailblazer</p>
+            <p><strong>Name:</strong> Dinh Hoang Duy Khanh</p>
+            <p><strong>Student ID:</strong> 2670306</p>
+            <p><strong>Role:</strong> Project owner · Architecture, PyTorch implementation & evaluation</p>
+            <p><strong>Personal Website:</strong> <a class="info-link" href="https://khanhhoangduydinh.github.io" target="_blank" rel="noopener">khanhhoangduydinh.github.io</a></p>
+            <p><strong>Repository:</strong> <a class="info-link" href="https://github.com/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision" target="_blank" rel="noopener">CO5085 Computer Vision</a></p>
+          </aside>
         </div>
+
         <div class="hero-actions">
-          <a class="primary-action" href="reports/exercises.pdf">Read E1–E3 report (PDF)</a>
-          <a class="secondary-action" href="CO5085%20Report%20Latex/a1_report.pdf">Read A1 report (PDF)</a>
+          <a class="primary-action" href="#quick-links">EXPLORE TASKS & NOTEBOOKS</a>
+          <a class="secondary-action" href="reports/exercises.pdf" target="_blank">READ E1–E3 REPORT (PDF)</a>
+          <a class="secondary-action" href="CO5085%20Report%20Latex/a1_report.pdf" target="_blank">READ A1 REPORT (PDF)</a>
+        </div>
+      </section>
+
+      <section class="ticker" aria-label="Technologies used">
+        <div class="ticker-track">
+          <span>PYTHON</span><i></i><span>PYTORCH</span><i></i><span>TORCHVISION</span><i></i>
+          <span>CUDA</span><i></i><span>RESNET-18</span><i></i><span>SWIN TRANSFORMER</span><i></i>
+          <span>SELF-ATTENTION</span><i></i><span>LSTM &amp; GRU</span><i></i><span>FASHION-MNIST</span><i></i>
+          <span>CIFAR-100</span><i></i><span>SEABORN</span>
+        </div>
+      </section>
+
+      <section class="quick-table-section" id="quick-links">
+        <p class="section-label">01 — QUICK LINKS &amp; EXECUTED NOTEBOOKS</p>
+        <h2>Coursework &amp; Assignment Deliverables</h2>
+        <p>Tất cả các bài tập đều có file báo cáo PDF chuẩn mực và notebook Google Colab tương ứng đã được chạy thực thi hoàn chỉnh (kèm biểu đồ, ma trận nhầm lẫn và log huấn luyện).</p>
+
+        <div class="quick-table-wrapper">
+          <table class="quick-table">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Dataset &amp; Problem</th>
+                <th>Selected Winner</th>
+                <th>Report PDF</th>
+                <th>Google Colab (Đã chạy hoàn chỉnh)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>E1: Classifiers</strong></td>
+                <td>Fashion-MNIST: Softmax linear, MLP, and CNN classifiers with manual PyTorch loop</td>
+                <td>CNN (<strong>86.86%</strong>)</td>
+                <td><a href="reports/exercises.pdf" target="_blank"><strong>Exercises Report (PDF)</strong></a></td>
+                <td>
+                  <a class="colab-badge-link" href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/notebooks/e1_image_classifiers.ipynb" target="_blank" rel="noopener">
+                    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open E1 In Colab">
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>E2: Attention</strong></td>
+                <td>Fashion-MNIST: Manual Multi-Head Self-Attention vs PyTorch MSA, patch/stem/row tokenizers</td>
+                <td>PyTorch MSA + CNN Stem (<strong>75.78%</strong>)</td>
+                <td><a href="reports/exercises.pdf" target="_blank"><strong>Exercises Report (PDF)</strong></a></td>
+                <td>
+                  <a class="colab-badge-link" href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/notebooks/e2_transformer_attention.ipynb" target="_blank" rel="noopener">
+                    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open E2 In Colab">
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>E3: Sequences</strong></td>
+                <td>Fashion-MNIST: 28-row recurrent image modeling (LSTM, GRU) vs CNN baseline</td>
+                <td>LSTM Rows (<strong>82.01%</strong>)</td>
+                <td><a href="reports/exercises.pdf" target="_blank"><strong>Exercises Report (PDF)</strong></a></td>
+                <td>
+                  <a class="colab-badge-link" href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/notebooks/e3_image_sequences.ipynb" target="_blank" rel="noopener">
+                    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open E3 In Colab">
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>A1: Transfer Learning</strong></td>
+                <td>CIFAR-100: ResNet-18 vs Swin-T across scratch, head-only, partial, and full fine-tuning</td>
+                <td>Swin-T Full (<strong>81.73%</strong>)</td>
+                <td><a href="CO5085%20Report%20Latex/a1_report.pdf" target="_blank"><strong>A1 Report (PDF)</strong></a></td>
+                <td>
+                  <a class="colab-badge-link" href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/notebooks/a1_cnn_vs_transformer.ipynb" target="_blank" rel="noopener">
+                    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open A1 In Colab">
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
       <section class="result-strip" id="results" aria-label="Main result">
-        <p>A1 selected result</p>
+        <p>A1 Selected Winner</p>
         <strong>81.73%</strong>
-        <span>Swin-T full fine-tune test accuracy</span>
-        <span class="result-note">CIFAR-100 · seed 42 · batch 64 · 3 epochs</span>
+        <span>Swin-T full fine-tune test accuracy (81.62% Macro-F1)</span>
+        <span class="result-note">CIFAR-100 · 10,000 test images · seed 42 · ImageNet transfer</span>
       </section>
 
       <section class="method-note">
         <div>
-          <p class="section-label">Shared experiment rules</p>
-          <h2>Same split, honest selection.</h2>
+          <p class="section-label">Shared experiment protocol</p>
+          <h2>Honest splits, zero leakage.</h2>
         </div>
-        <p>E1-E3 share the same Fashion-MNIST split. A1 uses 400 training and 100 validation images from each CIFAR-100 fine class, then evaluates the validation winner once on the untouched official test set. Results show actual executed runs, not estimated scores.</p>
+        <p>E1–E3 share an identical 48,000 / 12,000 / 10,000 Fashion-MNIST split with fixed seed 42. A1 uses a stratified 40,000 / 10,000 split of CIFAR-100 (400 train, 100 val per fine class), reserving the official untouched 10,000-image test set for the single validation winner. All reported numbers reflect executed runs.</p>
       </section>
 
       <section class="exercise-grid" id="exercises">
         <article>
           <p class="exercise-number">E1</p>
-          <h2>Image classifiers</h2>
-          <p>Softmax, MLP, and CNN are trained with an explicit forward, loss, backward, and optimizer-step loop.</p>
+          <h2>Image Classifiers</h2>
+          <p>Softmax Linear, MLP, and CNN are trained with an explicit manual loop (zero_grad -> forward -> loss -> backward -> step).</p>
           <dl>
-            <div><dt>Selected model</dt><dd>CNN</dd></div>
-            <div><dt>Test accuracy</dt><dd>86.86%</dd></div>
-            <div><dt>Evidence</dt><dd>Curves, confusion matrix, error samples</dd></div>
+            <div><dt>Selected Model</dt><dd>CNN (105k params)</dd></div>
+            <div><dt>Test Accuracy</dt><dd>86.86% (Val: 86.98%)</dd></div>
+            <div><dt>Artifacts</dt><dd>Loss curves, confusion matrix, errors</dd></div>
           </dl>
-          <a href="E1/run_e1.py">Open E1 source</a>
+          <div class="badge-row">
+            <a href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/notebooks/e1_image_classifiers.ipynb" target="_blank" rel="noopener">
+              <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab E1">
+            </a>
+          </div>
+          <a href="E1/run_e1.py">Open E1 Python Source</a>
+          <a href="reports/exercises.pdf">Read Exercises Report (PDF)</a>
         </article>
+
         <article>
           <p class="exercise-number">E2</p>
-          <h2>Image attention</h2>
-          <p>Manual multi-head self-attention is checked against PyTorch attention with patch and CNN-stem tokens.</p>
+          <h2>Transformer Attention</h2>
+          <p>Manual Multi-Head Self-Attention is coded from basic matrix ops and benchmarked against PyTorch MSA across 3 tokenizers.</p>
           <dl>
-            <div><dt>Selected model</dt><dd>MSA + CNN stem</dd></div>
-            <div><dt>Test accuracy</dt><dd>75.78%</dd></div>
-            <div><dt>Evidence</dt><dd>Tokenization and MSA comparison</dd></div>
+            <div><dt>Selected Model</dt><dd>PyTorch MSA + CNN Stem</dd></div>
+            <div><dt>Test Accuracy</dt><dd>75.78% (Manual: 70.61%)</dd></div>
+            <div><dt>Tokenizers</dt><dd>Patch 4x4, CNN-Stem, Row</dd></div>
           </dl>
-          <a href="E2/run_e2.py">Open E2 source</a>
+          <div class="badge-row">
+            <a href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/notebooks/e2_transformer_attention.ipynb" target="_blank" rel="noopener">
+              <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab E2">
+            </a>
+          </div>
+          <a href="E2/run_e2.py">Open E2 Python Source</a>
+          <a href="reports/exercises.pdf">Read Exercises Report (PDF)</a>
         </article>
+
         <article>
           <p class="exercise-number">E3</p>
-          <h2>Image sequences</h2>
-          <p>Each 28-pixel image row becomes one time step for LSTM and GRU; the E1 CNN is the baseline.</p>
+          <h2>Recurrent Sequences</h2>
+          <p>Each 28-pixel image row is treated as one time step for sequential processing by LSTM and GRU, compared to CNN baseline.</p>
           <dl>
-            <div><dt>Selected model</dt><dd>LSTM rows</dd></div>
-            <div><dt>Test accuracy</dt><dd>82.01%</dd></div>
-            <div><dt>Evidence</dt><dd>Learning curves and CNN comparison</dd></div>
+            <div><dt>Selected Model</dt><dd>LSTM Rows (24k params)</dd></div>
+            <div><dt>Test Accuracy</dt><dd>82.01% (GRU: 81.56%)</dd></div>
+            <div><dt>Baseline Check</dt><dd>CNN 86.86% > LSTM 82.01%</dd></div>
           </dl>
-          <a href="E3/run_e3.py">Open E3 source</a>
+          <div class="badge-row">
+            <a href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/notebooks/e3_image_sequences.ipynb" target="_blank" rel="noopener">
+              <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab E3">
+            </a>
+          </div>
+          <a href="E3/run_e3.py">Open E3 Python Source</a>
+          <a href="reports/exercises.pdf">Read Exercises Report (PDF)</a>
         </article>
+
         <article>
           <p class="exercise-number">A1</p>
           <h2>CNN vs Transformer</h2>
-          <p>ResNet-18 and Swin-T are compared from scratch and with ImageNet pretraining, including head-only, partial, and full fine-tuning.</p>
+          <p>ResNet-18 vs Swin-T on CIFAR-100 across 4 training modes: scratch, head-only, partial fine-tuning, and full fine-tuning.</p>
           <dl>
-            <div><dt>Dataset</dt><dd>CIFAR-100 · 100 classes</dd></div>
-            <div><dt>Selected model</dt><dd>Swin-T full fine-tune</dd></div>
-            <div><dt>Test accuracy / macro-F1</dt><dd>81.73% / 81.62%</dd></div>
+            <div><dt>Selected Model</dt><dd>Swin-T Full Fine-tune</dd></div>
+            <div><dt>Test Acc / Macro-F1</dt><dd>81.73% / 81.62%</dd></div>
+            <div><dt>Comparison</dt><dd>Swin-T 81.7% vs ResNet 74.4%</dd></div>
           </dl>
+          <div class="badge-row">
+            <a href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/notebooks/a1_cnn_vs_transformer.ipynb" target="_blank" rel="noopener">
+              <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab A1">
+            </a>
+          </div>
           <a href="A1/run_a1.py">Open A1 source</a>
           <a href="A1/README.md">Read A1 guide</a>
           <a href="CO5085%20Report%20Latex/a1_report.pdf">Read A1 report</a>
@@ -101,20 +223,39 @@
       <section class="run-section" id="reproduce">
         <div>
           <p class="section-label">Reproduce the submission</p>
-          <h2>Run one command per deliverable.</h2>
-          <p>Install the packages in <code>requirements.txt</code>. Fashion-MNIST or CIFAR-100 downloads on the first run, and generated figures are saved under <code>reports/</code>.</p>
-          <p><a href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/CO5085_Exercises_E1_E2_E3.ipynb" target="_blank" rel="noopener"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a></p>
+          <h2>Run locally or on Google Colab.</h2>
+          <p>Install dependencies from <code>requirements.txt</code>. Fashion-MNIST and CIFAR-100 download automatically on first run. Generated metrics and figures are saved under <code>reports/</code>.</p>
+          <p style="margin-top: 18px;">
+            <a href="https://colab.research.google.com/github/khanhhoangduydinh/CO5085-Deep_Learning_and_Its_Applications_in_Computer_Vision/blob/main/CO5085_Exercises_E1_E2_E3.ipynb" target="_blank" rel="noopener">
+              <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open Combined Coursework in Colab">
+            </a>
+          </p>
         </div>
-        <pre><code>python -m E1.run_e1
+        <pre><code># 1. Cài đặt các thư viện
+pip install -r requirements.txt
+
+# 2. Chạy bài tập Coursework (Fashion-MNIST)
+python -m E1.run_e1
 python -m E2.run_e2
 python -m E3.run_e3
-python -m A1.run_a1</code></pre>
+
+# 3. Chạy Assignment 1 (CIFAR-100 ResNet-18 vs Swin-T)
+python -m A1.run_a1
+
+# 4. Kiểm thử tự động
+pytest</code></pre>
       </section>
     </main>
 
     <footer>
-      <span>CO5085 Exercises and A1 · HK261 (2026–2027)</span>
-      <span><a href="CO5085_Exercises_E1_E2_E3.ipynb">Colab Notebook</a> · <a href="reports/exercises.pdf">E1-E3 PDF (exercises.pdf)</a> · <a href="CO5085%20Report%20Latex/report.pdf">LaTeX source PDF</a> · <a href="CO5085%20Report%20Latex/a1_report.pdf">A1 PDF</a></span>
+      <span>CO5085 Exercises &amp; Assignment 1 · HK261 (2026–2027) · HCMUT</span>
+      <span>
+        <a href="CO5085_Exercises_E1_E2_E3.ipynb">Master Colab</a> ·
+        <a href="reports/exercises.pdf">Exercises PDF</a> ·
+        <a href="CO5085%20Report%20Latex/report.pdf">LaTeX Report PDF</a> ·
+        <a href="CO5085%20Report%20Latex/a1_report.pdf">A1 PDF</a> ·
+        <a href="exercise-vne.pdf">Assignment Brief</a>
+      </span>
     </footer>
   </body>
 </html>
